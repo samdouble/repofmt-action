@@ -8,6 +8,27 @@
 
 # repolint-action
 
+## Usage
+
+Create a repository in your organization with a `repolint.json` file at the root with the following contents:
+
+```yaml
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+
+- name: repolint
+  uses: samdouble/repolint-action@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+![GitHub token](./docs/token.png)
+
 ## Configuration
 
 ### Inputs
@@ -18,7 +39,7 @@
 
 ### repolint.json
 
-The action can be configured by creating a `repolint.json` file in the root of your repository.
+The action can be configured by creating a `repolint.json` file at the root of your repository.
 
 ```json
 {

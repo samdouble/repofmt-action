@@ -1,22 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import * as fs from 'fs';
-import * as path from 'path';
-
-export const getConfig = () => {
-  const workspaceRoot = process.env.GITHUB_WORKSPACE || process.cwd();
-  const configPath = path.join(workspaceRoot, 'repolint.json');
-
-  if (!fs.existsSync(configPath)) {
-    core.setFailed(`repolint.json not found at ${configPath}`);
-    return;
-  }
-
-  core.info(`Found repolint.json at ${configPath}`);
-
-  const configContent = fs.readFileSync(configPath, 'utf-8');
-  return JSON.parse(configContent);
-};
+import { getConfig } from '../utils/config';
+import { rulesMapper } from './rulesMapper';
 
 export async function main() {
   core.info(`Running repolint action`);
@@ -41,16 +26,15 @@ export async function main() {
     core.info(`==================`);
 
     try {
-      const { data: contents } = await octokit.rest.repos.getContent({
-        owner: repo.owner.login,
-        repo: repo.name,
-        path: '',
-      });
-
-      if (Array.isArray(contents)) {
-        for (const item of contents) {
-          const icon = item.type === 'dir' ? '📁' : '📄';
-          core.info(`      ${icon} ${item.name}`);
+      for (const rule of config.rules) {
+        const ruleFunction = rulesMapper[rule as keyof typeof rulesMapper];
+        if (ruleFunction) {
+          const result = await ruleFunction(octokit, repo);
+          if (result) {
+            core.info(`  - ${rule} passed`);
+          } else {
+            core.warning(`  - ${rule} failed`);
+          }
         }
       }
     } catch (error) {
