@@ -34,9 +34,6 @@ export const fileExists = async (octokit: Octokit, repository: Repository, ruleO
           ? item.name === sanitizedRuleOptions.path
           : item.name.toLowerCase() === sanitizedRuleOptions.path.toLowerCase();
       });
-    if (!file) {
-      core.info(`Contents: ${JSON.stringify(contents.map((item: { name: string }) => item.name), null, 2)}`);
-    }
     return !!file;
   }
   return false;
