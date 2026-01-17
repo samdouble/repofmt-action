@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { fileExists } from './file-exists';
 
 export const readmeExistsOptionsSchema = z.object({
-  caseInsensitive: z.boolean().optional().default(false),
+  caseSensitive: z.boolean().optional().default(false),
   path: z.string().optional().default('README.md'),
 });
 

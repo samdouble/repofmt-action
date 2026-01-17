@@ -4,7 +4,7 @@ import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-meth
 import { z } from 'zod';
 
 export const fileExistsOptionsSchema = z.object({
-  caseInsensitive: z.boolean().optional().default(false),
+  caseSensitive: z.boolean().optional().default(false),
   path: z.string(),
 });
 
@@ -30,13 +30,11 @@ export const fileExists = async (octokit: Octokit, repository: Repository, ruleO
     const file = contents
       .filter(item => item.type === 'file')
       .find(item => {
-        return sanitizedRuleOptions.caseInsensitive
-          ? item.name.toLowerCase() === sanitizedRuleOptions.path.toLowerCase()
-          : item.name === sanitizedRuleOptions.path;
+        return sanitizedRuleOptions.caseSensitive
+          ? item.name === sanitizedRuleOptions.path
+          : item.name.toLowerCase() === sanitizedRuleOptions.path.toLowerCase();
       });
-    if (file) {
-      return true;
-    }
+    return !!file;
   }
   return false;
 };

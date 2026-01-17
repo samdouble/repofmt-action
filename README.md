@@ -56,20 +56,16 @@ The `file-exists` rule checks if a file exists in the repository.
 ```json
 {
   "file-exists": {
-    "caseInsensitive": true,
+    "caseSensitive": true,
     "path": "file.md"
   }
 }
 ```
 
-##### `caseInsensitive`
-
-The `caseInsensitive` option is used to check if the file exists in a case-insensitive manner. 
-Default: `false`.
-
-##### `path`
-
-The `path` option is used to specify the path to the file. It is mandatory.
+| Option | Description | Required | Default |
+|--------|-------------|----------|---------|
+| `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No | `false` |
+| `path` | The path to the file. | Yes |  |
 
 #### `readme/exists`
 
@@ -78,18 +74,13 @@ The `readme/exists` rule checks if a README file exists in the repository.
 ```json
 {
   "readme/exists": {
-    "caseInsensitive": true,
+    "caseSensitive": true,
     "path": "README.md"
   }
 }
 ```
 
-##### `caseInsensitive`
-
-The `caseInsensitive` option is used to check if the README file exists in a case-insensitive manner. 
-Default: `false`.
-
-##### `path`
-
-The `path` option is used to specify the path to the README file.
-Default: `README.md`.
+| Option | Description | Required | Default |
+|--------|-------------|----------|---------|
+| `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No | `false` |
+| `path` | The path to the file. | No | `README.md` |
