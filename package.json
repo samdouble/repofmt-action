@@ -1,0 +1,15 @@
+{
+  "name": "repolint-monorepo",
+  "private": true,
+  "workspaces": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

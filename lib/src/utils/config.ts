@@ -1,8 +1,7 @@
-import * as core from '@actions/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { z } from 'zod';
-import { ruleConfigSchema } from '../src/rules';
+import { ruleConfigSchema } from '../rules';
 
 export const configSchema = z.object({
   rules: ruleConfigSchema.optional().default({}),
@@ -18,7 +17,7 @@ export const getConfig = (): Config => {
     throw new Error(`repolint.json not found at ${configPath}`);
   }
 
-  core.info(`Found repolint.json at ${configPath}`);
+  console.info(`Found repolint.json at ${configPath}`);
 
   const configContent = fs.readFileSync(configPath, 'utf-8');
   const parsed = JSON.parse(configContent);

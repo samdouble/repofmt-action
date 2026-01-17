@@ -1,4 +1,3 @@
-import * as core from '@actions/core';
 import type { getOctokit } from '@actions/github';
 import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
 import { z } from 'zod';
@@ -19,8 +18,7 @@ export const licenseExists = async (octokit: Octokit, repository: Repository, ru
   try {
     sanitizedRuleOptions = licenseExistsOptionsSchema.parse(ruleOptions);
   } catch (error) {
-    core.setFailed(`Invalid rule options: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    return false;
+    throw new Error(`Invalid rule options: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
   return await fileExists(octokit, repository, sanitizedRuleOptions);
 };
