@@ -4,7 +4,7 @@ import * as path from 'path';
 import { z } from 'zod';
 import { ruleConfigSchema } from '../src/rules';
 
-const configSchema = z.object({
+export const configSchema = z.object({
   rules: ruleConfigSchema.optional().default({}),
 });
 

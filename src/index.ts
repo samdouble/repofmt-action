@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import { Config, getConfig } from '../utils/config';
+import { Config, configSchema, getConfig } from '../utils/config';
 import { rulesMapper } from './rulesMapper';
 
 export async function main() {
@@ -12,6 +12,14 @@ export async function main() {
     core.info('Loaded configuration');
   } catch (error) {
     core.setFailed(`Failed to load configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    return;
+  }
+
+  let sanitizedConfig: Config;
+  try {
+    sanitizedConfig = configSchema.parse(config);
+  } catch (error) {
+    core.setFailed(`Invalid configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
     return;
   }
 
@@ -31,15 +39,17 @@ export async function main() {
     core.info(`==================`);
 
     try {
-      for (const [rule, ruleOptions] of Object.entries(config.rules ?? {})) {
+      for (const [rule, ruleOptions] of Object.entries(sanitizedConfig.rules ?? {})) {
         const ruleFunction = rulesMapper[rule as keyof typeof rulesMapper];
-        if (ruleFunction) {
-          const result = await ruleFunction(octokit, repo, ruleOptions);
-          if (result) {
-            core.info(`  - ${rule} passed`);
-          } else {
-            core.warning(`  - ${rule} failed`);
-          }
+        if (!ruleFunction) {
+          core.setFailed(`Rule ${rule} not found`);
+          return;
+        }
+        const result = await ruleFunction(octokit, repo, ruleOptions);
+        if (result) {
+          core.info(`  - ${rule} passed`);
+        } else {
+          core.warning(`  - ${rule} failed`);
         }
       }
     } catch (error) {
