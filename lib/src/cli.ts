@@ -1,20 +1,17 @@
 #!/usr/bin/env node
 import { getOctokit } from '@actions/github';
-import { getConfig, configSchema, runRepolint } from './index';
+import { getConfig, runRepolint } from './index';
 
 async function main() {
   console.log('Running repolint...');
 
   let config;
   try {
-    const rawConfig = getConfig();
-    if (!rawConfig) {
-      console.error('Failed to load repolint.json');
-      process.exit(1);
-    }
-    config = configSchema.parse(rawConfig);
+    config = await getConfig();
   } catch (error) {
-    console.error(`Invalid configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error(
+      `Configuration error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
     process.exit(1);
   }
 

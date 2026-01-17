@@ -37,14 +37,19 @@ on:
 
 `github-token` is the GitHub token to use for API access. It is optional and must be a personal access token with the `repo` scope. If not provided, the action will use the default GitHub token.
 
-### repolint.json
+### repolint.config.ts
 
-The action can be configured by creating a `repolint.json` file at the root of your repository.
+The action can be configured by creating a `repolint.config.ts` file at the root of your repository. `repolint.config.js`, `repolint.config.mjs`, and `repolint.config.cjs` are also supported.
 
-```json
-{
-  "repos": ["repo1", "repo2", "repo3"]
-}
+```ts
+export default {
+  rules: {
+    'file-exists': {
+      caseSensitive: true,
+      path: 'file.md',
+    },
+  },
+};
 ```
 
 ### Rules

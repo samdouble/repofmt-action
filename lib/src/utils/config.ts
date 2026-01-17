@@ -1,5 +1,7 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import { createJiti } from 'jiti';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { z } from 'zod';
 import { ruleConfigSchema } from '../rules';
 
@@ -9,22 +11,40 @@ export const configSchema = z.object({
 
 export type Config = z.infer<typeof configSchema>;
 
-export const getConfig = (): Config => {
-  const workspaceRoot = process.env.GITHUB_WORKSPACE || process.cwd();
-  const configPath = path.join(workspaceRoot, 'repolint.json');
+const CONFIG_FILES = [
+  'repolint.config.ts',
+  'repolint.config.js',
+  'repolint.config.mjs',
+  'repolint.config.cjs',
+];
 
-  if (!fs.existsSync(configPath)) {
-    throw new Error(`repolint.json not found at ${configPath}`);
+export const getConfig = async (): Promise<Config> => {
+  const workspaceRoot = process.env.GITHUB_WORKSPACE || process.cwd();
+
+  let configPath: string | undefined;
+  for (const configFile of CONFIG_FILES) {
+    const candidatePath = path.join(workspaceRoot, configFile);
+    if (fs.existsSync(candidatePath)) {
+      configPath = candidatePath;
+      break;
+    }
   }
 
-  console.info(`Found repolint.json at ${configPath}`);
+  if (!configPath) {
+    throw new Error(
+      `No config file found. Create one of: ${CONFIG_FILES.join(', ')}`,
+    );
+  }
 
-  const configContent = fs.readFileSync(configPath, 'utf-8');
-  const parsed = JSON.parse(configContent);
+  console.info(`Found config at ${configPath}`);
 
-  const result = configSchema.safeParse(parsed);
+  const jiti = createJiti(pathToFileURL(__filename).href);
+  const configModule = await jiti.import(configPath);
+  const rawConfig = (configModule as { default?: unknown }).default ?? configModule;
+
+  const result = configSchema.safeParse(rawConfig);
   if (!result.success) {
-    throw new Error(`Invalid repolint.json: ${result.error.message}`);
+    throw new Error(`Invalid config: ${result.error.message}`);
   }
 
   return result.data;
