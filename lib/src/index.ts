@@ -1,13 +1,13 @@
+import type { getOctokit } from '@actions/github';
+import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
+import { rulesMapper } from './rulesMapper';
+import { Config } from './utils/config';
+
 export { getConfig, configSchema, type Config } from './utils/config';
 export { rulesMapper } from './rulesMapper';
 export { readmeExists } from './rules/readme-exists';
 export { licenseExists } from './rules/license-exists';
 export { fileExists } from './rules/file-exists';
-
-import type { getOctokit } from '@actions/github';
-import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
-import { rulesMapper } from './rulesMapper';
-import { Config } from './utils/config';
 
 export type Octokit = ReturnType<typeof getOctokit>;
 export type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
@@ -42,7 +42,7 @@ export async function runRulesForRepo(
   };
 }
 
-export async function runRepolint(
+export async function run(
   octokit: Octokit,
   config: Config,
 ): Promise<RepolintResult[]> {

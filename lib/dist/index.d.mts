@@ -1,6 +1,59 @@
-export declare const rulesMapper: {
-    'file-exists': (octokit: import("@octokit/core").Octokit & import("@octokit/plugin-rest-endpoint-methods/dist-types/types").Api & {
-        paginate: import("@octokit/plugin-paginate-rest").PaginateInterface;
+import { getOctokit } from '@actions/github';
+import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
+import { z } from 'zod';
+import * as _octokit_plugin_paginate_rest from '@octokit/plugin-paginate-rest';
+import * as _octokit_plugin_rest_endpoint_methods_dist_types_types from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
+import * as _octokit_core from '@octokit/core';
+
+declare const configSchema: z.ZodObject<{
+    rules: z.ZodDefault<z.ZodOptional<z.ZodObject<{
+        'file-exists': z.ZodOptional<z.ZodObject<{
+            caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+            path: z.ZodString;
+        }, z.core.$strip>>;
+        'license/exists': z.ZodOptional<z.ZodObject<{
+            caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+            path: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        }, z.core.$strip>>;
+        'readme/exists': z.ZodOptional<z.ZodObject<{
+            caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+            path: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+        }, z.core.$strip>>;
+    }, z.core.$strip>>>;
+}, z.core.$strip>;
+type Config = z.infer<typeof configSchema>;
+declare const getConfig: (configPathArg?: string) => Promise<Config>;
+
+declare const readmeExistsOptionsSchema: z.ZodObject<{
+    caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+    path: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+}, z.core.$strip>;
+type ReadmeExistsOptions = z.infer<typeof readmeExistsOptionsSchema>;
+type Octokit$3 = ReturnType<typeof getOctokit>;
+type Repository$3 = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
+declare const readmeExists: (octokit: Octokit$3, repository: Repository$3, ruleOptions: ReadmeExistsOptions) => Promise<boolean>;
+
+declare const licenseExistsOptionsSchema: z.ZodObject<{
+    caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+    path: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+}, z.core.$strip>;
+type LicenseExistsOptions = z.infer<typeof licenseExistsOptionsSchema>;
+type Octokit$2 = ReturnType<typeof getOctokit>;
+type Repository$2 = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
+declare const licenseExists: (octokit: Octokit$2, repository: Repository$2, ruleOptions: LicenseExistsOptions) => Promise<boolean>;
+
+declare const fileExistsOptionsSchema: z.ZodObject<{
+    caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+    path: z.ZodString;
+}, z.core.$strip>;
+type fileExistsOptions = z.infer<typeof fileExistsOptionsSchema>;
+type Octokit$1 = ReturnType<typeof getOctokit>;
+type Repository$1 = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
+declare const fileExists: (octokit: Octokit$1, repository: Repository$1, ruleOptions: fileExistsOptions) => Promise<boolean>;
+
+declare const rulesMapper: {
+    'file-exists': (octokit: _octokit_core.Octokit & _octokit_plugin_rest_endpoint_methods_dist_types_types.Api & {
+        paginate: _octokit_plugin_paginate_rest.PaginateInterface;
     }, repository: {
         id: number;
         node_id: string;
@@ -132,9 +185,9 @@ export declare const rulesMapper: {
         master_branch?: string;
         starred_at?: string;
         anonymous_access_enabled?: boolean;
-    }, ruleOptions: import("./rules/file-exists").fileExistsOptions) => Promise<boolean>;
-    'license/exists': (octokit: import("@octokit/core").Octokit & import("@octokit/plugin-rest-endpoint-methods/dist-types/types").Api & {
-        paginate: import("@octokit/plugin-paginate-rest").PaginateInterface;
+    }, ruleOptions: fileExistsOptions) => Promise<boolean>;
+    'license/exists': (octokit: _octokit_core.Octokit & _octokit_plugin_rest_endpoint_methods_dist_types_types.Api & {
+        paginate: _octokit_plugin_paginate_rest.PaginateInterface;
     }, repository: {
         id: number;
         node_id: string;
@@ -266,9 +319,9 @@ export declare const rulesMapper: {
         master_branch?: string;
         starred_at?: string;
         anonymous_access_enabled?: boolean;
-    }, ruleOptions: import("./rules/license-exists").LicenseExistsOptions) => Promise<boolean>;
-    'readme/exists': (octokit: import("@octokit/core").Octokit & import("@octokit/plugin-rest-endpoint-methods/dist-types/types").Api & {
-        paginate: import("@octokit/plugin-paginate-rest").PaginateInterface;
+    }, ruleOptions: LicenseExistsOptions) => Promise<boolean>;
+    'readme/exists': (octokit: _octokit_core.Octokit & _octokit_plugin_rest_endpoint_methods_dist_types_types.Api & {
+        paginate: _octokit_plugin_paginate_rest.PaginateInterface;
     }, repository: {
         id: number;
         node_id: string;
@@ -400,6 +453,19 @@ export declare const rulesMapper: {
         master_branch?: string;
         starred_at?: string;
         anonymous_access_enabled?: boolean;
-    }, ruleOptions: import("./rules/readme-exists").ReadmeExistsOptions) => Promise<boolean>;
+    }, ruleOptions: ReadmeExistsOptions) => Promise<boolean>;
 };
-//# sourceMappingURL=rulesMapper.d.ts.map
+
+type Octokit = ReturnType<typeof getOctokit>;
+type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
+interface RepolintResult {
+    repository: string;
+    results: {
+        rule: string;
+        passed: boolean;
+    }[];
+}
+declare function runRulesForRepo(octokit: Octokit, repo: Repository, config: Config): Promise<RepolintResult>;
+declare function run(octokit: Octokit, config: Config): Promise<RepolintResult[]>;
+
+export { type Config, type Octokit, type RepolintResult, type Repository, configSchema, fileExists, getConfig, licenseExists, readmeExists, rulesMapper, run, runRulesForRepo };

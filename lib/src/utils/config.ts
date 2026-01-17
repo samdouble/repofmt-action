@@ -18,22 +18,32 @@ const CONFIG_FILES = [
   'repolint.config.cjs',
 ];
 
-export const getConfig = async (): Promise<Config> => {
-  const workspaceRoot = process.env.GITHUB_WORKSPACE || process.cwd();
-
+export const getConfig = async (configPathArg?: string): Promise<Config> => {
   let configPath: string | undefined;
-  for (const configFile of CONFIG_FILES) {
-    const candidatePath = path.join(workspaceRoot, configFile);
-    if (fs.existsSync(candidatePath)) {
-      configPath = candidatePath;
-      break;
-    }
-  }
 
-  if (!configPath) {
-    throw new Error(
-      `No config file found. Create one of: ${CONFIG_FILES.join(', ')}`,
-    );
+  if (configPathArg) {
+    const resolvedPath = path.isAbsolute(configPathArg)
+      ? configPathArg
+      : path.join(process.cwd(), configPathArg);
+    if (!fs.existsSync(resolvedPath)) {
+      throw new Error(`Config file not found: ${configPathArg}`);
+    }
+    configPath = resolvedPath;
+  } else {
+    const workspaceRoot = process.cwd();
+    for (const configFile of CONFIG_FILES) {
+      const candidatePath = path.join(workspaceRoot, configFile);
+      if (fs.existsSync(candidatePath)) {
+        configPath = candidatePath;
+        break;
+      }
+    }
+
+    if (!configPath) {
+      throw new Error(
+        `No config file found. Create one of: ${CONFIG_FILES.join(', ')}`,
+      );
+    }
   }
 
   console.info(`Found config at ${configPath}`);
