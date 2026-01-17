@@ -10,4 +10,4 @@ permissions:
   contents: read
 runs:
   using: node20
-  main: dist/index.js
+  main: action/dist/index.js
