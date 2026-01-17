@@ -7,6 +7,8 @@ export default defineConfig([
   {
     files: ['**/*.ts', '**/*.cts', '**.*.mts'],
     rules: {
+      'comma-dangle': ['error', 'always-multiline'],
+      'no-var': 'error',
       'prefer-const': 'error',
 			semi: 'error',
 		},

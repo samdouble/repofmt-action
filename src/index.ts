@@ -1,14 +1,20 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import { getConfig } from '../utils/config';
+import { Config, getConfig } from '../utils/config';
 import { rulesMapper } from './rulesMapper';
+import { ReadmeExistsOptions } from './rules/readme-exists';
 
 export async function main() {
   core.info(`Running repolint action`);
 
-  const config = getConfig();
-
-  core.info(`Loaded configuration: ${JSON.stringify(config, null, 2)}`);
+  let config: Config | undefined;
+  try {
+    config = getConfig();
+    core.info('Loaded configuration');
+  } catch (error) {
+    core.setFailed(`Failed to load configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    return;
+  }
 
   const token = core.getInput('github-token', { required: true });
   const octokit = github.getOctokit(token);
@@ -26,10 +32,10 @@ export async function main() {
     core.info(`==================`);
 
     try {
-      for (const rule of config.rules) {
+      for (const [rule, ruleOptions] of Object.entries(config.rules ?? {})) {
         const ruleFunction = rulesMapper[rule as keyof typeof rulesMapper];
         if (ruleFunction) {
-          const result = await ruleFunction(octokit, repo);
+          const result = await ruleFunction(octokit, repo, ruleOptions as unknown as ReadmeExistsOptions);
           if (result) {
             core.info(`  - ${rule} passed`);
           } else {
