@@ -1,5 +1,5 @@
 {
-  "name": "repolint-monorepo",
+  "name": "repolint-action",
   "private": true,
   "workspaces": [
     "lib"

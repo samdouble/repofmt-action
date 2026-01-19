@@ -4,17 +4,17 @@ import { z } from 'zod';
 import { fileExists } from './file-exists';
 
 export const licenseExistsOptionsSchema = z.object({
-  caseSensitive: z.boolean().optional().default(false),
-  path: z.string().optional().default('LICENSE.md'),
+  caseSensitive: z.boolean().default(false),
+  path: z.string().default('LICENSE.md'),
 });
 
-export type LicenseExistsOptions = z.infer<typeof licenseExistsOptionsSchema>;
+export type licenseExistsOptions = z.infer<typeof licenseExistsOptionsSchema>;
 
 type Octokit = ReturnType<typeof getOctokit>;
 type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
 
-export const licenseExists = async (octokit: Octokit, repository: Repository, ruleOptions: LicenseExistsOptions) => {
-  let sanitizedRuleOptions: LicenseExistsOptions;
+export const licenseExists = async (octokit: Octokit, repository: Repository, ruleOptions: licenseExistsOptions) => {
+  let sanitizedRuleOptions: licenseExistsOptions;
   try {
     sanitizedRuleOptions = licenseExistsOptionsSchema.parse(ruleOptions);
   } catch (error) {

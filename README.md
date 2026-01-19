@@ -8,9 +8,11 @@
 
 # repolint-action
 
+This tool checks consistency across repositories.
+
 ## Usage
 
-Create a repository in your organization with a `repolint.json` file at the root with the following contents:
+Create a repository in your organization with a `repolint.config.ts`. Then, add the following to your repository's `.github/workflows/repolint.yml` file:
 
 ```yaml
 
@@ -28,6 +30,23 @@ on:
 ```
 
 ![GitHub token](./docs/token.png)
+
+### CLI
+
+```bash
+npx repolint run [options]
+```
+
+#### Options
+
+| Option | Description | Required | Default |
+|--------|-------------|----------|---------|
+| `--config <path>` | Path to the config file. | No | `repolint.config.ts` |
+| `--token <token>` | GitHub token (can also use GITHUB_TOKEN env var). | No |  |
+
+### GitHub Action
+
+TODO
 
 ## Configuration
 

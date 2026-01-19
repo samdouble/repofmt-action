@@ -3,11 +3,11 @@ import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-meth
 import { z } from 'zod';
 
 export const fileExistsOptionsSchema = z.object({
-  caseSensitive: z.boolean().optional().default(false),
+  caseSensitive: z.boolean().default(false),
   path: z.string(),
 });
 
-export type fileExistsOptions = z.infer<typeof fileExistsOptionsSchema>;
+export type fileExistsOptions = z.input<typeof fileExistsOptionsSchema>;
 
 type Octokit = ReturnType<typeof getOctokit>;
 type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];

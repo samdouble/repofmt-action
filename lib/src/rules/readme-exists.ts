@@ -8,13 +8,13 @@ export const readmeExistsOptionsSchema = z.object({
   path: z.string().optional().default('README.md'),
 });
 
-export type ReadmeExistsOptions = z.infer<typeof readmeExistsOptionsSchema>;
+export type readmeExistsOptions = z.infer<typeof readmeExistsOptionsSchema>;
 
 type Octokit = ReturnType<typeof getOctokit>;
 type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
 
-export const readmeExists = async (octokit: Octokit, repository: Repository, ruleOptions: ReadmeExistsOptions) => {
-  let sanitizedRuleOptions: ReadmeExistsOptions;
+export const readmeExists = async (octokit: Octokit, repository: Repository, ruleOptions: readmeExistsOptions) => {
+  let sanitizedRuleOptions: readmeExistsOptions;
   try {
     sanitizedRuleOptions = readmeExistsOptionsSchema.parse(ruleOptions);
   } catch (error) {
