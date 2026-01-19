@@ -54,7 +54,9 @@ program
         for (const { rule, passed } of repoResult.results) {
           const icon = passed ? '✓' : '✗';
           console.log(`  ${icon} ${rule}`);
-          if (!passed) hasFailures = true;
+          if (!passed) {
+            hasFailures = true;
+          }
         }
       }
 

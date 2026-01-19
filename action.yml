@@ -28,4 +28,4 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
-      run: node ${{ github.action_path }}/lib/dist/cli.js
+      run: node ${{ github.action_path }}/lib/dist/cli.js run

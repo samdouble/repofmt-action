@@ -6,7 +6,6 @@ permissions:
   contents: write
   pull-requests: write
 
-
 jobs:
   checks:
     strategy:
@@ -40,3 +39,22 @@ jobs:
       - name: Build
         run: |
           npm run build
+      - name: Test CLI
+        run: |
+          echo "
+            export default {
+              rules: {
+                'file-exists': {
+                  path: 'README.md',
+                },
+              },
+            };
+          " > repolint.config.ts
+
+          node dist/cli.js --help
+          node dist/cli.js --version
+
+          npm link
+          repolint run --help
+          repolint run --version
+          repolint run --config repolint.config.ts
