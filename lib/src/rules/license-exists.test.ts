@@ -30,7 +30,7 @@ describe('licenseExists', () => {
       });
 
       const result = await licenseExists(mockOctokit, mockRepository, {} as licenseExistsOptions);
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
     });
 
     it('should return true with case insensitive match by default', async () => {
@@ -42,7 +42,7 @@ describe('licenseExists', () => {
       });
 
       const result = await licenseExists(mockOctokit, mockRepository, {} as licenseExistsOptions);
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
     });
 
     it('should return true when custom license path is specified', async () => {
@@ -54,7 +54,7 @@ describe('licenseExists', () => {
       });
 
       const result = await licenseExists(mockOctokit, mockRepository, { path: 'LICENSE.txt' } as licenseExistsOptions);
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
     });
   });
 
@@ -68,7 +68,7 @@ describe('licenseExists', () => {
       });
 
       const result = await licenseExists(mockOctokit, mockRepository, {} as licenseExistsOptions);
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['LICENSE.md not found'] });
     });
 
     it('should return false when repository is empty', async () => {
@@ -77,7 +77,7 @@ describe('licenseExists', () => {
       });
 
       const result = await licenseExists(mockOctokit, mockRepository, {} as licenseExistsOptions);
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['LICENSE.md not found'] });
     });
   });
 
@@ -91,7 +91,7 @@ describe('licenseExists', () => {
         path: 'LICENSE.md',
         caseSensitive: true,
       });
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
     });
 
     it('should return false when case does not match with caseSensitive: true', async () => {
@@ -103,7 +103,7 @@ describe('licenseExists', () => {
         path: 'LICENSE.md',
         caseSensitive: true,
       });
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['LICENSE.md not found'] });
     });
   });
 

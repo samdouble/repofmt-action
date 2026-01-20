@@ -6,7 +6,10 @@ import { z } from 'zod';
 import { ruleConfigSchema } from '../rules';
 
 export const configSchema = z.object({
-  rules: ruleConfigSchema.optional().default({}),
+  rules: [
+    z.enum(['error', 'warning']),
+    ruleConfigSchema.optional().default({}),
+  ],
 });
 
 export type Config = z.infer<typeof configSchema>;

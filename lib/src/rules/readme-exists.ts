@@ -20,5 +20,6 @@ export const readmeExists = async (octokit: Octokit, repository: Repository, rul
   } catch (error) {
     throw new Error(`Invalid rule options: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-  return await fileExists(octokit, repository, sanitizedRuleOptions);
+  const { errors } = await fileExists(octokit, repository, sanitizedRuleOptions);
+  return { errors };
 };

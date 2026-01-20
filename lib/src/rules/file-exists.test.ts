@@ -31,7 +31,7 @@ describe('fileExists', () => {
       });
 
       const result = await fileExists(mockOctokit, mockRepository, { path: 'readme.md' });
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
       expect(mockGetContent).toHaveBeenCalledWith({
         owner: 'test-owner',
         repo: 'test-repo',
@@ -51,7 +51,7 @@ describe('fileExists', () => {
         path: 'README.md',
         caseSensitive: true,
       });
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
     });
 
     it('should return false when file case does not match with caseSensitive: true', async () => {
@@ -66,7 +66,7 @@ describe('fileExists', () => {
         path: 'readme.md',
         caseSensitive: true,
       });
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['readme.md not found'] });
     });
   });
 
@@ -80,7 +80,7 @@ describe('fileExists', () => {
       });
 
       const result = await fileExists(mockOctokit, mockRepository, { path: 'README.md' });
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['README.md not found'] });
     });
 
     it('should return false when repository is empty', async () => {
@@ -89,7 +89,7 @@ describe('fileExists', () => {
       });
 
       const result = await fileExists(mockOctokit, mockRepository, { path: 'README.md' });
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['README.md not found'] });
     });
   });
 
@@ -100,7 +100,7 @@ describe('fileExists', () => {
       });
 
       const result = await fileExists(mockOctokit, mockRepository, { path: 'README.md' });
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['Contents is not an array'] });
     });
   });
 
@@ -114,7 +114,7 @@ describe('fileExists', () => {
       });
 
       const result = await fileExists(mockOctokit, mockRepository, { path: 'src' });
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['src not found'] });
     });
   });
 

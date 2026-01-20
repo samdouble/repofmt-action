@@ -51,10 +51,14 @@ program
         console.log(`\n${repoResult.repository}`);
         console.log('='.repeat(repoResult.repository.length));
 
-        for (const { rule, passed } of repoResult.results) {
-          const icon = passed ? '✓' : '✗';
-          console.log(`  ${icon} ${rule}`);
-          if (!passed) {
+        for (const { rule, errors, warnings } of repoResult.results) {
+          for (const error of errors ?? []) {
+            console.log(`  ❌ ${rule}: ${error}`);
+          }
+          for (const warning of warnings ?? []) {
+            console.log(`  ⚠️ ${rule}: ${warning}`);
+          }
+          if (errors && errors.length > 0) {
             hasFailures = true;
           }
         }

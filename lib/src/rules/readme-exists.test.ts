@@ -30,7 +30,7 @@ describe('readmeExists', () => {
       });
 
       const result = await readmeExists(mockOctokit, mockRepository, {} as readmeExistsOptions);
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
     });
 
     it('should return true with case insensitive match by default', async () => {
@@ -42,7 +42,7 @@ describe('readmeExists', () => {
       });
 
       const result = await readmeExists(mockOctokit, mockRepository, {} as readmeExistsOptions);
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
     });
 
     it('should return true when custom readme path is specified', async () => {
@@ -54,7 +54,7 @@ describe('readmeExists', () => {
       });
 
       const result = await readmeExists(mockOctokit, mockRepository, { path: 'README.txt' } as readmeExistsOptions);
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
     });
 
     it('should return true for README without extension', async () => {
@@ -66,7 +66,7 @@ describe('readmeExists', () => {
       });
 
       const result = await readmeExists(mockOctokit, mockRepository, { path: 'README' } as readmeExistsOptions);
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
     });
   });
 
@@ -80,7 +80,7 @@ describe('readmeExists', () => {
       });
 
       const result = await readmeExists(mockOctokit, mockRepository, {} as readmeExistsOptions);
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['README.md not found'] });
     });
 
     it('should return false when repository is empty', async () => {
@@ -89,7 +89,7 @@ describe('readmeExists', () => {
       });
 
       const result = await readmeExists(mockOctokit, mockRepository, {} as readmeExistsOptions);
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['README.md not found'] });
     });
 
     it('should return false when only directories exist', async () => {
@@ -101,7 +101,7 @@ describe('readmeExists', () => {
       });
 
       const result = await readmeExists(mockOctokit, mockRepository, {} as readmeExistsOptions);
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['README.md not found'] });
     });
   });
 
@@ -115,7 +115,7 @@ describe('readmeExists', () => {
         path: 'README.md',
         caseSensitive: true,
       });
-      expect(result).toBe(true);
+      expect(result).toEqual({ errors: [] });
     });
 
     it('should return false when case does not match with caseSensitive: true', async () => {
@@ -127,7 +127,7 @@ describe('readmeExists', () => {
         path: 'README.md',
         caseSensitive: true,
       });
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['README.md not found'] });
     });
 
     it('should return false for Readme.md when looking for README.md with caseSensitive: true', async () => {
@@ -139,7 +139,7 @@ describe('readmeExists', () => {
         path: 'README.md',
         caseSensitive: true,
       });
-      expect(result).toBe(false);
+      expect(result).toEqual({ errors: ['README.md not found'] });
     });
   });
 

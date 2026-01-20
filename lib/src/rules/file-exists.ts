@@ -13,6 +13,7 @@ type Octokit = ReturnType<typeof getOctokit>;
 type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
 
 export const fileExists = async (octokit: Octokit, repository: Repository, ruleOptions: fileExistsOptions) => {
+  const errors: string[] = [];
   const { data: contents } = await octokit.rest.repos.getContent({
     owner: repository.owner.login,
     repo: repository.name,
@@ -32,7 +33,11 @@ export const fileExists = async (octokit: Octokit, repository: Repository, ruleO
           ? item.name === sanitizedRuleOptions.path
           : item.name.toLowerCase() === sanitizedRuleOptions.path.toLowerCase();
       });
-    return !!file;
+    if (!file) {
+      errors.push(`${sanitizedRuleOptions.path} not found`);
+    }
+  } else {
+    errors.push(`Contents is not an array`);
   }
-  return false;
+  return { errors };
 };
