@@ -1,7 +1,6 @@
-import type { getOctokit } from '@actions/github';
-import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
 import { z } from 'zod';
 import { AlertLevelSchema } from '../utils/types';
+import type { RuleContext } from '../utils/context';
 
 export const FileForbiddenOptionsSchema = z.object({
   caseSensitive: z.boolean().default(false),
@@ -16,16 +15,10 @@ export const FileForbiddenSchema = z.object({
 
 export type FileForbiddenOptions = z.input<typeof FileForbiddenOptionsSchema>;
 
-type Octokit = ReturnType<typeof getOctokit>;
-type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
-
-export const fileForbidden = async (octokit: Octokit, repository: Repository, ruleOptions: FileForbiddenOptions) => {
+export const fileForbidden = async (context: RuleContext, ruleOptions: FileForbiddenOptions) => {
   const errors: string[] = [];
-  const { data: contents } = await octokit.rest.repos.getContent({
-    owner: repository.owner.login,
-    repo: repository.name,
-    path: '',
-  });
+  const contents = await context.getContent('');
+
   let sanitizedRuleOptions: FileForbiddenOptions;
   try {
     sanitizedRuleOptions = FileForbiddenOptionsSchema.parse(ruleOptions);

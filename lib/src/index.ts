@@ -2,8 +2,10 @@ import type { getOctokit } from '@actions/github';
 import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
 import { rulesMapper } from './rulesMapper';
 import { Config } from './utils/config';
+import { RuleContext } from './utils/context';
 
 export { getConfig, configSchema, type Config } from './utils/config';
+export { RuleContext } from './utils/context';
 export { rulesMapper } from './rulesMapper';
 export { fileExists } from './rules/file-exists';
 export { fileForbidden } from './rules/file-forbidden';
@@ -28,6 +30,7 @@ export async function runRulesForRepo(
   config: Config,
 ): Promise<RunResult> {
   const results: RunResult['results'] = [];
+  const context = new RuleContext(octokit, repo);
 
   for (const ruleConfig of config.rules ?? []) {
     const { name: rule, level: alertLevel, options: ruleOptions } = ruleConfig;
@@ -35,7 +38,7 @@ export async function runRulesForRepo(
     if (!ruleFunction) {
       throw new Error(`Rule ${rule} not found`);
     }
-    const { errors } = await ruleFunction(octokit, repo, ruleOptions);
+    const { errors } = await ruleFunction(context, ruleOptions);
     if (errors.length > 0) {
       if (alertLevel === 'error') {
         results.push({ rule, errors });

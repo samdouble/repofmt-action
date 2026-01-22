@@ -1,7 +1,6 @@
-import type { getOctokit } from '@actions/github';
-import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
 import { z } from 'zod';
 import { AlertLevelSchema } from '../utils/types';
+import type { RuleContext } from '../utils/context';
 
 export const FileExistsOptionsSchema = z.object({
   caseSensitive: z.boolean().default(false),
@@ -16,16 +15,10 @@ export const FileExistsSchema = z.object({
 
 export type FileExistsOptions = z.input<typeof FileExistsOptionsSchema>;
 
-type Octokit = ReturnType<typeof getOctokit>;
-type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
-
-export const fileExists = async (octokit: Octokit, repository: Repository, ruleOptions: FileExistsOptions) => {
+export const fileExists = async (context: RuleContext, ruleOptions: FileExistsOptions) => {
   const errors: string[] = [];
-  const { data: contents } = await octokit.rest.repos.getContent({
-    owner: repository.owner.login,
-    repo: repository.name,
-    path: '',
-  });
+  const contents = await context.getContent('');
+
   let sanitizedRuleOptions: FileExistsOptions;
   try {
     sanitizedRuleOptions = FileExistsOptionsSchema.parse(ruleOptions);

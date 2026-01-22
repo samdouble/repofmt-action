@@ -1,5 +1,6 @@
 import type { getOctokit } from '@actions/github';
 import { fileForbidden, FileForbiddenOptionsSchema, type FileForbiddenOptions } from './file-forbidden';
+import { RuleContext } from '../utils/context';
 
 const mockGetContent = jest.fn();
 const mockOctokit = {
@@ -13,7 +14,8 @@ const mockOctokit = {
 const mockRepository = {
   owner: { login: 'test-owner' },
   name: 'test-repo',
-} as Parameters<typeof fileForbidden>[1];
+  full_name: 'test-owner/test-repo',
+} as ConstructorParameters<typeof RuleContext>[1];
 
 describe('fileForbidden', () => {
   beforeEach(() => {
@@ -30,7 +32,8 @@ describe('fileForbidden', () => {
         ],
       });
 
-      const result = await fileForbidden(mockOctokit, mockRepository, { path: '.DS_Store' });
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: '.DS_Store' });
       expect(result).toEqual({ errors: [] });
       expect(mockGetContent).toHaveBeenCalledWith({
         owner: 'test-owner',
@@ -44,7 +47,8 @@ describe('fileForbidden', () => {
         data: [],
       });
 
-      const result = await fileForbidden(mockOctokit, mockRepository, { path: '.DS_Store' });
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: '.DS_Store' });
       expect(result).toEqual({ errors: [] });
     });
   });
@@ -59,7 +63,8 @@ describe('fileForbidden', () => {
         ],
       });
 
-      const result = await fileForbidden(mockOctokit, mockRepository, { path: '.ds_store' });
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: '.ds_store' });
       expect(result).toEqual({ errors: ['.ds_store should not exist'] });
     });
 
@@ -71,7 +76,8 @@ describe('fileForbidden', () => {
         ],
       });
 
-      const result = await fileForbidden(mockOctokit, mockRepository, {
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, {
         path: '.DS_Store',
         caseSensitive: true,
       });
@@ -86,7 +92,8 @@ describe('fileForbidden', () => {
         ],
       });
 
-      const result = await fileForbidden(mockOctokit, mockRepository, {
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, {
         path: '.ds_store',
         caseSensitive: true,
       });
@@ -100,7 +107,8 @@ describe('fileForbidden', () => {
         data: { name: '.DS_Store', type: 'file' },
       });
 
-      const result = await fileForbidden(mockOctokit, mockRepository, { path: '.DS_Store' });
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: '.DS_Store' });
       expect(result).toEqual({ errors: ['Contents is not an array'] });
     });
   });
@@ -114,7 +122,8 @@ describe('fileForbidden', () => {
         ],
       });
 
-      const result = await fileForbidden(mockOctokit, mockRepository, { path: 'node_modules' });
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: 'node_modules' });
       expect(result).toEqual({ errors: [] });
     });
   });
@@ -125,8 +134,9 @@ describe('fileForbidden', () => {
         data: [{ name: '.DS_Store', type: 'file' }],
       });
 
+      const context = new RuleContext(mockOctokit, mockRepository);
       await expect(
-        fileForbidden(mockOctokit, mockRepository, {} as FileForbiddenOptions),
+        fileForbidden(context, {} as FileForbiddenOptions),
       ).rejects.toThrow('Invalid rule options');
     });
 
@@ -135,9 +145,28 @@ describe('fileForbidden', () => {
         data: [{ name: '.DS_Store', type: 'file' }],
       });
 
+      const context = new RuleContext(mockOctokit, mockRepository);
       await expect(
-        fileForbidden(mockOctokit, mockRepository, { path: 123 } as unknown as FileForbiddenOptions),
+        fileForbidden(context, { path: 123 } as unknown as FileForbiddenOptions),
       ).rejects.toThrow('Invalid rule options');
+    });
+  });
+
+  describe('caching', () => {
+    it('should only call API once when checking multiple files', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: '.DS_Store', type: 'file' },
+          { name: 'package.json', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      await fileForbidden(context, { path: '.DS_Store' });
+      await fileForbidden(context, { path: '.env' });
+      await fileForbidden(context, { path: 'node_modules' });
+
+      expect(mockGetContent).toHaveBeenCalledTimes(1);
     });
   });
 });

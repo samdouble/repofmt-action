@@ -1,5 +1,6 @@
-import { getOctokit } from '@actions/github';
+import type { getOctokit } from '@actions/github';
 import { readmeExists, ReadmeExistsOptionsSchema, type ReadmeExistsOptions } from './readme-exists';
+import { RuleContext } from '../utils/context';
 
 const mockGetContent = jest.fn();
 const mockOctokit = {
@@ -13,7 +14,8 @@ const mockOctokit = {
 const mockRepository = {
   owner: { login: 'test-owner' },
   name: 'test-repo',
-} as Parameters<typeof readmeExists>[1];
+  full_name: 'test-owner/test-repo',
+} as ConstructorParameters<typeof RuleContext>[1];
 
 describe('readmeExists', () => {
   beforeEach(() => {
@@ -29,8 +31,14 @@ describe('readmeExists', () => {
         ],
       });
 
-      const result = await readmeExists(mockOctokit, mockRepository, {} as ReadmeExistsOptions);
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await readmeExists(context, {});
       expect(result).toEqual({ errors: [] });
+      expect(mockGetContent).toHaveBeenCalledWith({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        path: '',
+      });
     });
 
     it('should return true with case insensitive match by default', async () => {
@@ -41,19 +49,21 @@ describe('readmeExists', () => {
         ],
       });
 
-      const result = await readmeExists(mockOctokit, mockRepository, {} as ReadmeExistsOptions);
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await readmeExists(context, {});
       expect(result).toEqual({ errors: [] });
     });
 
     it('should return true when custom readme path is specified', async () => {
       mockGetContent.mockResolvedValue({
         data: [
-          { name: 'README.txt', type: 'file' },
+          { name: 'docs.md', type: 'file' },
           { name: 'package.json', type: 'file' },
         ],
       });
 
-      const result = await readmeExists(mockOctokit, mockRepository, { path: 'README.txt' } as ReadmeExistsOptions);
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await readmeExists(context, { path: 'docs.md' });
       expect(result).toEqual({ errors: [] });
     });
 
@@ -65,7 +75,8 @@ describe('readmeExists', () => {
         ],
       });
 
-      const result = await readmeExists(mockOctokit, mockRepository, { path: 'README' } as ReadmeExistsOptions);
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await readmeExists(context, { path: 'README' });
       expect(result).toEqual({ errors: [] });
     });
   });
@@ -74,12 +85,13 @@ describe('readmeExists', () => {
     it('should return false when README.md is not found', async () => {
       mockGetContent.mockResolvedValue({
         data: [
-          { name: 'LICENSE.md', type: 'file' },
           { name: 'package.json', type: 'file' },
+          { name: 'src', type: 'dir' },
         ],
       });
 
-      const result = await readmeExists(mockOctokit, mockRepository, {} as ReadmeExistsOptions);
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await readmeExists(context, {});
       expect(result).toEqual({ errors: ['README.md not found'] });
     });
 
@@ -88,7 +100,8 @@ describe('readmeExists', () => {
         data: [],
       });
 
-      const result = await readmeExists(mockOctokit, mockRepository, {} as ReadmeExistsOptions);
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await readmeExists(context, {});
       expect(result).toEqual({ errors: ['README.md not found'] });
     });
 
@@ -100,7 +113,8 @@ describe('readmeExists', () => {
         ],
       });
 
-      const result = await readmeExists(mockOctokit, mockRepository, {} as ReadmeExistsOptions);
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await readmeExists(context, {});
       expect(result).toEqual({ errors: ['README.md not found'] });
     });
   });
@@ -108,37 +122,40 @@ describe('readmeExists', () => {
   describe('with caseSensitive option', () => {
     it('should return true when exact case matches with caseSensitive: true', async () => {
       mockGetContent.mockResolvedValue({
-        data: [{ name: 'README.md', type: 'file' }],
+        data: [
+          { name: 'README.md', type: 'file' },
+          { name: 'package.json', type: 'file' },
+        ],
       });
 
-      const result = await readmeExists(mockOctokit, mockRepository, {
-        path: 'README.md',
-        caseSensitive: true,
-      });
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await readmeExists(context, { caseSensitive: true });
       expect(result).toEqual({ errors: [] });
     });
 
     it('should return false when case does not match with caseSensitive: true', async () => {
       mockGetContent.mockResolvedValue({
-        data: [{ name: 'readme.md', type: 'file' }],
+        data: [
+          { name: 'readme.md', type: 'file' },
+          { name: 'package.json', type: 'file' },
+        ],
       });
 
-      const result = await readmeExists(mockOctokit, mockRepository, {
-        path: 'README.md',
-        caseSensitive: true,
-      });
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await readmeExists(context, { caseSensitive: true });
       expect(result).toEqual({ errors: ['README.md not found'] });
     });
 
     it('should return false for Readme.md when looking for README.md with caseSensitive: true', async () => {
       mockGetContent.mockResolvedValue({
-        data: [{ name: 'Readme.md', type: 'file' }],
+        data: [
+          { name: 'Readme.md', type: 'file' },
+          { name: 'package.json', type: 'file' },
+        ],
       });
 
-      const result = await readmeExists(mockOctokit, mockRepository, {
-        path: 'README.md',
-        caseSensitive: true,
-      });
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await readmeExists(context, { caseSensitive: true });
       expect(result).toEqual({ errors: ['README.md not found'] });
     });
   });
@@ -149,8 +166,9 @@ describe('readmeExists', () => {
         data: [{ name: 'README.md', type: 'file' }],
       });
 
+      const context = new RuleContext(mockOctokit, mockRepository);
       await expect(
-        readmeExists(mockOctokit, mockRepository, { caseSensitive: 'yes' } as unknown as ReadmeExistsOptions),
+        readmeExists(context, { caseSensitive: 'true' } as unknown as ReadmeExistsOptions),
       ).rejects.toThrow('Invalid rule options');
     });
 
@@ -159,8 +177,9 @@ describe('readmeExists', () => {
         data: [{ name: 'README.md', type: 'file' }],
       });
 
+      const context = new RuleContext(mockOctokit, mockRepository);
       await expect(
-        readmeExists(mockOctokit, mockRepository, { path: 123 } as unknown as ReadmeExistsOptions),
+        readmeExists(context, { path: 123 } as unknown as ReadmeExistsOptions),
       ).rejects.toThrow('Invalid rule options');
     });
   });
@@ -173,8 +192,8 @@ describe('ReadmeExistsOptionsSchema', () => {
   });
 
   it('should parse options with custom path', () => {
-    const result = ReadmeExistsOptionsSchema.parse({ path: 'README.rst' });
-    expect(result).toEqual({ path: 'README.rst', caseSensitive: false });
+    const result = ReadmeExistsOptionsSchema.parse({ path: 'docs.md' });
+    expect(result).toEqual({ path: 'docs.md', caseSensitive: false });
   });
 
   it('should parse options with caseSensitive: true', () => {
@@ -183,8 +202,8 @@ describe('ReadmeExistsOptionsSchema', () => {
   });
 
   it('should parse options with all values specified', () => {
-    const result = ReadmeExistsOptionsSchema.parse({ path: 'README', caseSensitive: true });
-    expect(result).toEqual({ path: 'README', caseSensitive: true });
+    const result = ReadmeExistsOptionsSchema.parse({ path: 'README.txt', caseSensitive: true });
+    expect(result).toEqual({ path: 'README.txt', caseSensitive: true });
   });
 
   it('should throw when path is not a string', () => {
@@ -192,6 +211,6 @@ describe('ReadmeExistsOptionsSchema', () => {
   });
 
   it('should throw when caseSensitive is not a boolean', () => {
-    expect(() => ReadmeExistsOptionsSchema.parse({ caseSensitive: 'yes' })).toThrow();
+    expect(() => ReadmeExistsOptionsSchema.parse({ caseSensitive: 'true' })).toThrow();
   });
 });

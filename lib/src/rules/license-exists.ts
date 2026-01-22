@@ -1,8 +1,7 @@
-import type { getOctokit } from '@actions/github';
-import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
 import { z } from 'zod';
 import { fileExists } from './file-exists';
 import { AlertLevelSchema } from '../utils/types';
+import type { RuleContext } from '../utils/context';
 
 export const LicenseExistsOptionsSchema = z.object({
   caseSensitive: z.boolean().default(false),
@@ -15,18 +14,15 @@ export const LicenseExistsSchema = z.object({
   options: LicenseExistsOptionsSchema,
 });
 
-export type LicenseExistsOptions = z.infer<typeof LicenseExistsOptionsSchema>;
+export type LicenseExistsOptions = z.input<typeof LicenseExistsOptionsSchema>;
 
-type Octokit = ReturnType<typeof getOctokit>;
-type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
-
-export const licenseExists = async (octokit: Octokit, repository: Repository, ruleOptions: LicenseExistsOptions) => {
-  let sanitizedRuleOptions: LicenseExistsOptions;
+export const licenseExists = async (context: RuleContext, ruleOptions: LicenseExistsOptions) => {
+  let sanitizedRuleOptions: z.output<typeof LicenseExistsOptionsSchema>;
   try {
     sanitizedRuleOptions = LicenseExistsOptionsSchema.parse(ruleOptions);
   } catch (error) {
     throw new Error(`Invalid rule options: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-  const { errors } = await fileExists(octokit, repository, sanitizedRuleOptions);
+  const { errors } = await fileExists(context, sanitizedRuleOptions);
   return { errors };
 };
