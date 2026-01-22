@@ -5,9 +5,10 @@ import { Config } from './utils/config';
 
 export { getConfig, configSchema, type Config } from './utils/config';
 export { rulesMapper } from './rulesMapper';
-export { readmeExists } from './rules/readme-exists';
-export { licenseExists } from './rules/license-exists';
 export { fileExists } from './rules/file-exists';
+export { fileForbidden } from './rules/file-forbidden';
+export { licenseExists } from './rules/license-exists';
+export { readmeExists } from './rules/readme-exists';
 
 export type Octokit = ReturnType<typeof getOctokit>;
 export type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
@@ -28,7 +29,8 @@ export async function runRulesForRepo(
 ): Promise<RunResult> {
   const results: RunResult['results'] = [];
 
-  for (const [rule, [alertLevel, ruleOptions]] of Object.entries(config.rules ?? {})) {
+  for (const ruleConfig of config.rules ?? []) {
+    const { name: rule, level: alertLevel, options: ruleOptions } = ruleConfig;
     const ruleFunction = rulesMapper[rule as keyof typeof rulesMapper];
     if (!ruleFunction) {
       throw new Error(`Rule ${rule} not found`);

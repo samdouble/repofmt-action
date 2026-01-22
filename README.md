@@ -97,6 +97,26 @@ The `file-exists` rule checks if a file exists in the repository.
 | `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
 | `path`          | The path to the file.                                           | Yes      |              |
 
+#### `file-forbidden`
+
+The `file-forbidden` rule checks that a file does NOT exist in the repository. This is useful for enforcing that certain files (like `.DS_Store`, `node_modules`, etc.) are not committed.
+
+```json
+{
+  "name": "file-forbidden",
+  "level": "error",
+  "options": {
+    "caseSensitive": true,
+    "path": ".DS_Store"
+  }
+}
+```
+
+| Option          | Description                                                     | Required | Default      |
+|-----------------|-----------------------------------------------------------------|----------|--------------|
+| `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
+| `path`          | The path to the file that should not exist.                     | Yes      |              |
+
 #### `license/exists`
 
 The `license/exists` rule checks if a LICENSE file exists in the repository.
