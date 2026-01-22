@@ -169,6 +169,79 @@ describe('fileForbidden', () => {
       expect(mockGetContent).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('nested files', () => {
+    it('should find a forbidden file in a subdirectory', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: '.env', type: 'file' },
+          { name: 'config.ts', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: 'config/.env' });
+      expect(result).toEqual({ errors: ['config/.env should not exist'] });
+      expect(mockGetContent).toHaveBeenCalledWith({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        path: 'config',
+      });
+    });
+
+    it('should find a forbidden file in a deeply nested subdirectory', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'secrets.json', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: 'src/config/secrets.json' });
+      expect(result).toEqual({ errors: ['src/config/secrets.json should not exist'] });
+      expect(mockGetContent).toHaveBeenCalledWith({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        path: 'src/config',
+      });
+    });
+
+    it('should return no error when nested file is not found', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'other.ts', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: 'src/.env' });
+      expect(result).toEqual({ errors: [] });
+    });
+
+    it('should return no error when directory does not exist', async () => {
+      mockGetContent.mockRejectedValue(new Error('Not Found'));
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: 'nonexistent/.env' });
+      expect(result).toEqual({ errors: [] });
+    });
+
+    it('should cache nested directory contents', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: '.env', type: 'file' },
+          { name: 'config.ts', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      await fileForbidden(context, { path: 'src/.env' });
+      await fileForbidden(context, { path: 'src/.env.local' });
+      await fileForbidden(context, { path: 'src/secrets.json' });
+
+      expect(mockGetContent).toHaveBeenCalledTimes(1);
+    });
+  });
 });
 
 describe('FileForbiddenOptionsSchema', () => {

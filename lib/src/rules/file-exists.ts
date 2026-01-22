@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { z } from 'zod';
 import { AlertLevelSchema } from '../utils/types';
 import type { RuleContext } from '../utils/context';
@@ -17,7 +18,6 @@ export type FileExistsOptions = z.input<typeof FileExistsOptionsSchema>;
 
 export const fileExists = async (context: RuleContext, ruleOptions: FileExistsOptions) => {
   const errors: string[] = [];
-  const contents = await context.getContent('');
 
   let sanitizedRuleOptions: FileExistsOptions;
   try {
@@ -25,16 +25,30 @@ export const fileExists = async (context: RuleContext, ruleOptions: FileExistsOp
   } catch (error) {
     throw new Error(`Invalid rule options: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+
+  const filePath = sanitizedRuleOptions.path;
+  const dirPath = path.dirname(filePath);
+  const fileName = path.basename(filePath);
+  const directoryPath = dirPath === '.' ? '' : dirPath;
+
+  let contents;
+  try {
+    contents = await context.getContent(directoryPath);
+  } catch {
+    errors.push(`${filePath} not found`);
+    return { errors };
+  }
+
   if (Array.isArray(contents)) {
     const file = contents
       .filter(item => item.type === 'file')
       .find(item => {
         return sanitizedRuleOptions.caseSensitive
-          ? item.name === sanitizedRuleOptions.path
-          : item.name.toLowerCase() === sanitizedRuleOptions.path.toLowerCase();
+          ? item.name === fileName
+          : item.name.toLowerCase() === fileName.toLowerCase();
       });
     if (!file) {
-      errors.push(`${sanitizedRuleOptions.path} not found`);
+      errors.push(`${filePath} not found`);
     }
   } else {
     errors.push(`Contents is not an array`);
