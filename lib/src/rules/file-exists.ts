@@ -8,10 +8,11 @@ export const FileExistsOptionsSchema = z.object({
   path: z.string(),
 });
 
-export const FileExistsSchema = z.tuple([
-  AlertLevelSchema,
-  FileExistsOptionsSchema,
-]);
+export const FileExistsSchema = z.object({
+  name: z.literal('file-exists'),
+  level: AlertLevelSchema,
+  options: FileExistsOptionsSchema,
+});
 
 export type FileExistsOptions = z.input<typeof FileExistsOptionsSchema>;
 

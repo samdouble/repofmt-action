@@ -3,10 +3,10 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { z } from 'zod';
-import { ruleConfigSchema } from '../rules';
+import { rulesConfigSchema } from '../rules';
 
 export const configSchema = z.object({
-  rules: ruleConfigSchema.optional().default({}),
+  rules: rulesConfigSchema.optional().default([]),
 });
 
 export type Config = z.infer<typeof configSchema>;

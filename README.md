@@ -62,12 +62,16 @@ The action can be configured by creating a `repofmt.config.ts` file at the root 
 
 ```ts
 export default {
-  rules: {
-    'file-exists': ['error', {
-      caseSensitive: true,
-      path: 'file.md',
-    }],
-  },
+  rules: [
+    {
+      name: 'file-exists',
+      level: 'error',
+      options: {
+        caseSensitive: true,
+        path: 'file.md',
+      },
+    },
+  ],
 };
 ```
 
@@ -79,17 +83,39 @@ The `file-exists` rule checks if a file exists in the repository.
 
 ```json
 {
-  "file-exists": ["error", {
+  "name": "file-exists",
+  "level": "error",
+  "options": {
     "caseSensitive": true,
     "path": "file.md"
-  }]
+  }
 }
 ```
 
-| Option | Description | Required | Default |
-|--------|-------------|----------|---------|
-| `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No | `false` |
-| `path` | The path to the file. | Yes |  |
+| Option          | Description                                                     | Required | Default      |
+|-----------------|-----------------------------------------------------------------|----------|--------------|
+| `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
+| `path`          | The path to the file.                                           | Yes      |              |
+
+#### `license/exists`
+
+The `license/exists` rule checks if a LICENSE file exists in the repository.
+
+```json
+{
+  "rule": "license/exists",
+  "level": "error",
+  "options": {
+    "caseSensitive": true,
+    "path": "LICENSE.md"
+  }
+}
+```
+
+| Option          | Description                                                     | Required | Default      |
+|-----------------|-----------------------------------------------------------------|----------|--------------|
+| `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
+| `path`          | The path to the file.                                           | No       | `LICENSE.md` |
 
 #### `readme/exists`
 
@@ -97,14 +123,16 @@ The `readme/exists` rule checks if a README file exists in the repository.
 
 ```json
 {
-  "readme/exists": ["error", {
+  "rule": "readme/exists",
+  "level": "error",
+  "options": {
     "caseSensitive": true,
     "path": "README.md"
-  }]
+  }
 }
 ```
 
-| Option | Description | Required | Default |
-|--------|-------------|----------|---------|
-| `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No | `false` |
-| `path` | The path to the file. | No | `README.md` |
+| Option          | Description                                                     | Required | Default     |
+|-----------------|-----------------------------------------------------------------|----------|-------------|
+| `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`     |
+| `path`          | The path to the file.                                           | No       | `README.md` |

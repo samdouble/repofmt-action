@@ -9,10 +9,11 @@ export const LicenseExistsOptionsSchema = z.object({
   path: z.string().default('LICENSE.md'),
 });
 
-export const LicenseExistsSchema = z.tuple([
-  AlertLevelSchema,
-  LicenseExistsOptionsSchema,
-]);
+export const LicenseExistsSchema = z.object({
+  name: z.literal('license/exists'),
+  level: AlertLevelSchema,
+  options: LicenseExistsOptionsSchema,
+});
 
 export type LicenseExistsOptions = z.infer<typeof LicenseExistsOptionsSchema>;
 

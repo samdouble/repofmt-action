@@ -3,13 +3,12 @@ import { FileExistsSchema } from './file-exists';
 import { LicenseExistsSchema } from './license-exists';
 import { ReadmeExistsSchema } from './readme-exists';
 
-export * from './readme-exists';
+export const ruleConfigSchema = z.union([
+  FileExistsSchema,
+  LicenseExistsSchema,
+  ReadmeExistsSchema,
+]);
 
-export const ruleConfigSchema = z.object({
-  'file-exists': FileExistsSchema.optional(),
-  'license/exists': LicenseExistsSchema.optional(),
-  'readme/exists': ReadmeExistsSchema.optional(),
-});
+export const rulesConfigSchema = z.array(ruleConfigSchema);
 
-export type RuleConfig = z.infer<typeof ruleConfigSchema>;
-export type RuleName = keyof RuleConfig;
+export type RulesConfig = z.infer<typeof rulesConfigSchema>;

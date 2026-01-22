@@ -9,10 +9,11 @@ export const ReadmeExistsOptionsSchema = z.object({
   path: z.string().optional().default('README.md'),
 });
 
-export const ReadmeExistsSchema = z.tuple([
-  AlertLevelSchema,
-  ReadmeExistsOptionsSchema,
-]);
+export const ReadmeExistsSchema = z.object({
+  name: z.literal('readme/exists'),
+  level: AlertLevelSchema,
+  options: ReadmeExistsOptionsSchema,
+});
 
 export type ReadmeExistsOptions = z.infer<typeof ReadmeExistsOptionsSchema>;
 
