@@ -168,6 +168,80 @@ describe('fileExists', () => {
       expect(mockGetContent).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('nested files', () => {
+    it('should find a file in a subdirectory', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'index.ts', type: 'file' },
+          { name: 'utils.ts', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: 'src/index.ts' });
+      expect(result).toEqual({ errors: [] });
+      expect(mockGetContent).toHaveBeenCalledWith({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        path: 'src',
+      });
+    });
+
+    it('should find a file in a deeply nested subdirectory', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'ci.yml', type: 'file' },
+          { name: 'release.yml', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: '.github/workflows/ci.yml' });
+      expect(result).toEqual({ errors: [] });
+      expect(mockGetContent).toHaveBeenCalledWith({
+        owner: 'test-owner',
+        repo: 'test-repo',
+        path: '.github/workflows',
+      });
+    });
+
+    it('should return error when nested file is not found', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'other.ts', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: 'src/index.ts' });
+      expect(result).toEqual({ errors: ['src/index.ts not found'] });
+    });
+
+    it('should return error when directory does not exist', async () => {
+      mockGetContent.mockRejectedValue(new Error('Not Found'));
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: 'nonexistent/file.ts' });
+      expect(result).toEqual({ errors: ['nonexistent/file.ts not found'] });
+    });
+
+    it('should cache nested directory contents', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'index.ts', type: 'file' },
+          { name: 'utils.ts', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      await fileExists(context, { path: 'src/index.ts' });
+      await fileExists(context, { path: 'src/utils.ts' });
+      await fileExists(context, { path: 'src/missing.ts' });
+
+      expect(mockGetContent).toHaveBeenCalledTimes(1);
+    });
+  });
 });
 
 describe('FileExistsOptionsSchema', () => {
