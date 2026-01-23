@@ -3,9 +3,12 @@ import { z } from 'zod';
 import { AlertLevelSchema } from '../utils/types';
 import type { RuleContext } from '../utils/context';
 
+export const EntryTypeSchema = z.enum(['file', 'directory', 'any']).default('file');
+
 export const FileForbiddenOptionsSchema = z.object({
   caseSensitive: z.boolean().default(false),
   path: z.union([z.string(), z.array(z.string()).min(1)]),
+  type: EntryTypeSchema,
 });
 
 export const FileForbiddenSchema = z.object({
@@ -16,13 +19,14 @@ export const FileForbiddenSchema = z.object({
 
 export type FileForbiddenOptions = z.input<typeof FileForbiddenOptionsSchema>;
 
-const checkFileExists = async (
+const checkEntryExists = async (
   context: RuleContext,
-  filePath: string,
+  entryPath: string,
   caseSensitive: boolean,
+  entryType: 'file' | 'directory' | 'any',
 ): Promise<boolean> => {
-  const dirPath = nodePath.dirname(filePath);
-  const fileName = nodePath.basename(filePath);
+  const dirPath = nodePath.dirname(entryPath);
+  const entryName = nodePath.basename(entryPath);
   const directoryPath = dirPath === '.' ? '' : dirPath;
 
   let contents;
@@ -36,15 +40,20 @@ const checkFileExists = async (
     return false;
   }
 
-  const file = contents
-    .filter(item => item.type === 'file')
+  const entry = contents
+    .filter(item => {
+      if (entryType === 'any') return true;
+      if (entryType === 'file') return item.type === 'file';
+      if (entryType === 'directory') return item.type === 'dir';
+      return false;
+    })
     .find(item => {
       return caseSensitive
-        ? item.name === fileName
-        : item.name.toLowerCase() === fileName.toLowerCase();
+        ? item.name === entryName
+        : item.name.toLowerCase() === entryName.toLowerCase();
     });
 
-  return !!file;
+  return !!entry;
 };
 
 export const fileForbidden = async (context: RuleContext, ruleOptions: FileForbiddenOptions) => {
@@ -61,19 +70,24 @@ export const fileForbidden = async (context: RuleContext, ruleOptions: FileForbi
     ? sanitizedRuleOptions.path
     : [sanitizedRuleOptions.path];
 
-  const foundFiles: string[] = [];
-  for (const filePath of paths) {
-    const exists = await checkFileExists(context, filePath, sanitizedRuleOptions.caseSensitive);
+  const foundEntries: string[] = [];
+  for (const entryPath of paths) {
+    const exists = await checkEntryExists(
+      context,
+      entryPath,
+      sanitizedRuleOptions.caseSensitive,
+      sanitizedRuleOptions.type,
+    );
     if (exists) {
-      foundFiles.push(filePath);
+      foundEntries.push(entryPath);
     }
   }
 
-  if (foundFiles.length > 0) {
-    const filesDisplay = foundFiles.length === 1
-      ? foundFiles[0]
-      : `[${foundFiles.join(', ')}]`;
-    errors.push(`${filesDisplay} should not exist`);
+  if (foundEntries.length > 0) {
+    const entriesDisplay = foundEntries.length === 1
+      ? foundEntries[0]
+      : `[${foundEntries.join(', ')}]`;
+    errors.push(`${entriesDisplay} should not exist`);
   }
 
   return { errors };

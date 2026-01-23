@@ -96,10 +96,11 @@ The `file-exists` rule checks if a file exists in the repository.
 |-----------------|-----------------------------------------------------------------|----------|--------------|
 | `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
 | `path`          | The path to the file, or an array of alternative paths.         | Yes      |              |
+| `type`          | The type of entry to look for: `file`, `directory`, or `any`.   | No       | `file`       |
 
 The `path` option supports nested paths (e.g., `.github/workflows/ci.yml`).
 
-You can also provide an array of alternative paths. The rule passes if **at least one** of the files exists:
+You can also provide an array of alternative paths. The rule passes if **at least one** of the entries exists:
 
 ```json
 {
@@ -107,6 +108,19 @@ You can also provide an array of alternative paths. The rule passes if **at leas
   "level": "error",
   "options": {
     "path": ["config.yml", "config.yaml"]
+  }
+}
+```
+
+You can use the `type` option to check for directories instead of files:
+
+```json
+{
+  "name": "file-exists",
+  "level": "error",
+  "options": {
+    "path": "src",
+    "type": "directory"
   }
 }
 ```
@@ -130,6 +144,7 @@ The `file-forbidden` rule checks that a file does NOT exist in the repository. T
 |-----------------|-----------------------------------------------------------------|----------|--------------|
 | `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
 | `path`          | The path to the file(s) that should not exist.                  | Yes      |              |
+| `type`          | The type of entry to look for: `file`, `directory`, or `any`.   | No       | `file`       |
 
 The `path` option supports nested paths (e.g., `src/config/secrets.json`).
 
@@ -141,6 +156,19 @@ You can provide an array of paths to forbid multiple files:
   "level": "error",
   "options": {
     "path": [".env", ".env.local", ".env.production"]
+  }
+}
+```
+
+You can use the `type` option to forbid directories instead of files:
+
+```json
+{
+  "name": "file-forbidden",
+  "level": "error",
+  "options": {
+    "path": "node_modules",
+    "type": "directory"
   }
 }
 ```
