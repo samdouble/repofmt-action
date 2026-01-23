@@ -1,471 +1,147 @@
 import { getOctokit } from '@actions/github';
 import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
 import { z } from 'zod';
-import * as _octokit_plugin_paginate_rest from '@octokit/plugin-paginate-rest';
-import * as _octokit_plugin_rest_endpoint_methods_dist_types_types from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
-import * as _octokit_core from '@octokit/core';
 
 declare const configSchema: z.ZodObject<{
-    rules: z.ZodDefault<z.ZodOptional<z.ZodObject<{
-        'file-exists': z.ZodOptional<z.ZodObject<{
+    rules: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodUnion<readonly [z.ZodObject<{
+        name: z.ZodLiteral<"file-exists">;
+        level: z.ZodEnum<{
+            error: "error";
+            warning: "warning";
+        }>;
+        options: z.ZodObject<{
+            caseSensitive: z.ZodDefault<z.ZodBoolean>;
+            path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+            type: z.ZodDefault<z.ZodEnum<{
+                any: "any";
+                file: "file";
+                directory: "directory";
+            }>>;
+        }, z.core.$strip>;
+    }, z.core.$strip>, z.ZodObject<{
+        name: z.ZodLiteral<"file-forbidden">;
+        level: z.ZodEnum<{
+            error: "error";
+            warning: "warning";
+        }>;
+        options: z.ZodObject<{
+            caseSensitive: z.ZodDefault<z.ZodBoolean>;
+            path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+            type: z.ZodDefault<z.ZodEnum<{
+                any: "any";
+                file: "file";
+                directory: "directory";
+            }>>;
+        }, z.core.$strip>;
+    }, z.core.$strip>, z.ZodObject<{
+        name: z.ZodLiteral<"license/exists">;
+        level: z.ZodEnum<{
+            error: "error";
+            warning: "warning";
+        }>;
+        options: z.ZodObject<{
+            caseSensitive: z.ZodDefault<z.ZodBoolean>;
+            path: z.ZodDefault<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
+        }, z.core.$strip>;
+    }, z.core.$strip>, z.ZodObject<{
+        name: z.ZodLiteral<"readme/exists">;
+        level: z.ZodEnum<{
+            error: "error";
+            warning: "warning";
+        }>;
+        options: z.ZodObject<{
             caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-            path: z.ZodString;
-        }, z.core.$strip>>;
-        'license/exists': z.ZodOptional<z.ZodObject<{
-            caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-            path: z.ZodDefault<z.ZodOptional<z.ZodString>>;
-        }, z.core.$strip>>;
-        'readme/exists': z.ZodOptional<z.ZodObject<{
-            caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-            path: z.ZodDefault<z.ZodOptional<z.ZodString>>;
-        }, z.core.$strip>>;
-    }, z.core.$strip>>>;
+            path: z.ZodDefault<z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>>;
+        }, z.core.$strip>;
+    }, z.core.$strip>]>>>>;
 }, z.core.$strip>;
 type Config = z.infer<typeof configSchema>;
 declare const getConfig: (configPathArg?: string) => Promise<Config>;
 
-declare const readmeExistsOptionsSchema: z.ZodObject<{
-    caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-    path: z.ZodDefault<z.ZodOptional<z.ZodString>>;
-}, z.core.$strip>;
-type ReadmeExistsOptions = z.infer<typeof readmeExistsOptionsSchema>;
-type Octokit$3 = ReturnType<typeof getOctokit>;
-type Repository$3 = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
-declare const readmeExists: (octokit: Octokit$3, repository: Repository$3, ruleOptions: ReadmeExistsOptions) => Promise<boolean>;
-
-declare const licenseExistsOptionsSchema: z.ZodObject<{
-    caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-    path: z.ZodDefault<z.ZodOptional<z.ZodString>>;
-}, z.core.$strip>;
-type LicenseExistsOptions = z.infer<typeof licenseExistsOptionsSchema>;
-type Octokit$2 = ReturnType<typeof getOctokit>;
-type Repository$2 = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
-declare const licenseExists: (octokit: Octokit$2, repository: Repository$2, ruleOptions: LicenseExistsOptions) => Promise<boolean>;
-
-declare const fileExistsOptionsSchema: z.ZodObject<{
-    caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-    path: z.ZodString;
-}, z.core.$strip>;
-type fileExistsOptions = z.infer<typeof fileExistsOptionsSchema>;
 type Octokit$1 = ReturnType<typeof getOctokit>;
 type Repository$1 = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
-declare const fileExists: (octokit: Octokit$1, repository: Repository$1, ruleOptions: fileExistsOptions) => Promise<boolean>;
+type RepoContent = RestEndpointMethodTypes['repos']['getContent']['response']['data'];
+declare class RuleContext {
+    readonly octokit: Octokit$1;
+    readonly repository: Repository$1;
+    private contentCache;
+    constructor(octokit: Octokit$1, repository: Repository$1);
+    getContent(path?: string): Promise<RepoContent>;
+    clearCache(): void;
+}
+
+declare const ReadmeExistsOptionsSchema: z.ZodObject<{
+    caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+    path: z.ZodDefault<z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>>;
+}, z.core.$strip>;
+type ReadmeExistsOptions = z.input<typeof ReadmeExistsOptionsSchema>;
+declare const readmeExists: (context: RuleContext, ruleOptions: ReadmeExistsOptions) => Promise<{
+    errors: string[];
+}>;
+
+declare const LicenseExistsOptionsSchema: z.ZodObject<{
+    caseSensitive: z.ZodDefault<z.ZodBoolean>;
+    path: z.ZodDefault<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
+}, z.core.$strip>;
+type LicenseExistsOptions = z.input<typeof LicenseExistsOptionsSchema>;
+declare const licenseExists: (context: RuleContext, ruleOptions: LicenseExistsOptions) => Promise<{
+    errors: string[];
+}>;
+
+declare const FileForbiddenOptionsSchema: z.ZodObject<{
+    caseSensitive: z.ZodDefault<z.ZodBoolean>;
+    path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+    type: z.ZodDefault<z.ZodEnum<{
+        any: "any";
+        file: "file";
+        directory: "directory";
+    }>>;
+}, z.core.$strip>;
+type FileForbiddenOptions = z.input<typeof FileForbiddenOptionsSchema>;
+declare const fileForbidden: (context: RuleContext, ruleOptions: FileForbiddenOptions) => Promise<{
+    errors: string[];
+}>;
+
+declare const FileExistsOptionsSchema: z.ZodObject<{
+    caseSensitive: z.ZodDefault<z.ZodBoolean>;
+    path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+    type: z.ZodDefault<z.ZodEnum<{
+        any: "any";
+        file: "file";
+        directory: "directory";
+    }>>;
+}, z.core.$strip>;
+type FileExistsOptions = z.input<typeof FileExistsOptionsSchema>;
+declare const fileExists: (context: RuleContext, ruleOptions: FileExistsOptions) => Promise<{
+    errors: string[];
+}>;
 
 declare const rulesMapper: {
-    'file-exists': (octokit: _octokit_core.Octokit & _octokit_plugin_rest_endpoint_methods_dist_types_types.Api & {
-        paginate: _octokit_plugin_paginate_rest.PaginateInterface;
-    }, repository: {
-        id: number;
-        node_id: string;
-        name: string;
-        full_name: string;
-        license: {
-            key: string;
-            name: string;
-            url: string | null;
-            spdx_id: string | null;
-            node_id: string;
-            html_url?: string;
-        } | null;
-        forks: number;
-        permissions?: {
-            admin: boolean;
-            pull: boolean;
-            triage?: boolean;
-            push: boolean;
-            maintain?: boolean;
-        };
-        owner: {
-            name?: string | null;
-            email?: string | null;
-            login: string;
-            id: number;
-            node_id: string;
-            avatar_url: string;
-            gravatar_id: string | null;
-            url: string;
-            html_url: string;
-            followers_url: string;
-            following_url: string;
-            gists_url: string;
-            starred_url: string;
-            subscriptions_url: string;
-            organizations_url: string;
-            repos_url: string;
-            events_url: string;
-            received_events_url: string;
-            type: string;
-            site_admin: boolean;
-            starred_at?: string;
-        };
-        private: boolean;
-        html_url: string;
-        description: string | null;
-        fork: boolean;
-        url: string;
-        archive_url: string;
-        assignees_url: string;
-        blobs_url: string;
-        branches_url: string;
-        collaborators_url: string;
-        comments_url: string;
-        commits_url: string;
-        compare_url: string;
-        contents_url: string;
-        contributors_url: string;
-        deployments_url: string;
-        downloads_url: string;
-        events_url: string;
-        forks_url: string;
-        git_commits_url: string;
-        git_refs_url: string;
-        git_tags_url: string;
-        git_url: string;
-        issue_comment_url: string;
-        issue_events_url: string;
-        issues_url: string;
-        keys_url: string;
-        labels_url: string;
-        languages_url: string;
-        merges_url: string;
-        milestones_url: string;
-        notifications_url: string;
-        pulls_url: string;
-        releases_url: string;
-        ssh_url: string;
-        stargazers_url: string;
-        statuses_url: string;
-        subscribers_url: string;
-        subscription_url: string;
-        tags_url: string;
-        teams_url: string;
-        trees_url: string;
-        clone_url: string;
-        mirror_url: string | null;
-        hooks_url: string;
-        svn_url: string;
-        homepage: string | null;
-        language: string | null;
-        forks_count: number;
-        stargazers_count: number;
-        watchers_count: number;
-        size: number;
-        default_branch: string;
-        open_issues_count: number;
-        is_template?: boolean;
-        topics?: string[];
-        has_issues: boolean;
-        has_projects: boolean;
-        has_wiki: boolean;
-        has_pages: boolean;
-        has_downloads: boolean;
-        has_discussions?: boolean;
-        archived: boolean;
-        disabled: boolean;
-        visibility?: string;
-        pushed_at: string | null;
-        created_at: string | null;
-        updated_at: string | null;
-        allow_rebase_merge?: boolean;
-        temp_clone_token?: string;
-        allow_squash_merge?: boolean;
-        allow_auto_merge?: boolean;
-        delete_branch_on_merge?: boolean;
-        allow_update_branch?: boolean;
-        use_squash_pr_title_as_default?: boolean;
-        squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-        squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-        merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-        merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-        allow_merge_commit?: boolean;
-        allow_forking?: boolean;
-        web_commit_signoff_required?: boolean;
-        open_issues: number;
-        watchers: number;
-        master_branch?: string;
-        starred_at?: string;
-        anonymous_access_enabled?: boolean;
-    }, ruleOptions: fileExistsOptions) => Promise<boolean>;
-    'license/exists': (octokit: _octokit_core.Octokit & _octokit_plugin_rest_endpoint_methods_dist_types_types.Api & {
-        paginate: _octokit_plugin_paginate_rest.PaginateInterface;
-    }, repository: {
-        id: number;
-        node_id: string;
-        name: string;
-        full_name: string;
-        license: {
-            key: string;
-            name: string;
-            url: string | null;
-            spdx_id: string | null;
-            node_id: string;
-            html_url?: string;
-        } | null;
-        forks: number;
-        permissions?: {
-            admin: boolean;
-            pull: boolean;
-            triage?: boolean;
-            push: boolean;
-            maintain?: boolean;
-        };
-        owner: {
-            name?: string | null;
-            email?: string | null;
-            login: string;
-            id: number;
-            node_id: string;
-            avatar_url: string;
-            gravatar_id: string | null;
-            url: string;
-            html_url: string;
-            followers_url: string;
-            following_url: string;
-            gists_url: string;
-            starred_url: string;
-            subscriptions_url: string;
-            organizations_url: string;
-            repos_url: string;
-            events_url: string;
-            received_events_url: string;
-            type: string;
-            site_admin: boolean;
-            starred_at?: string;
-        };
-        private: boolean;
-        html_url: string;
-        description: string | null;
-        fork: boolean;
-        url: string;
-        archive_url: string;
-        assignees_url: string;
-        blobs_url: string;
-        branches_url: string;
-        collaborators_url: string;
-        comments_url: string;
-        commits_url: string;
-        compare_url: string;
-        contents_url: string;
-        contributors_url: string;
-        deployments_url: string;
-        downloads_url: string;
-        events_url: string;
-        forks_url: string;
-        git_commits_url: string;
-        git_refs_url: string;
-        git_tags_url: string;
-        git_url: string;
-        issue_comment_url: string;
-        issue_events_url: string;
-        issues_url: string;
-        keys_url: string;
-        labels_url: string;
-        languages_url: string;
-        merges_url: string;
-        milestones_url: string;
-        notifications_url: string;
-        pulls_url: string;
-        releases_url: string;
-        ssh_url: string;
-        stargazers_url: string;
-        statuses_url: string;
-        subscribers_url: string;
-        subscription_url: string;
-        tags_url: string;
-        teams_url: string;
-        trees_url: string;
-        clone_url: string;
-        mirror_url: string | null;
-        hooks_url: string;
-        svn_url: string;
-        homepage: string | null;
-        language: string | null;
-        forks_count: number;
-        stargazers_count: number;
-        watchers_count: number;
-        size: number;
-        default_branch: string;
-        open_issues_count: number;
-        is_template?: boolean;
-        topics?: string[];
-        has_issues: boolean;
-        has_projects: boolean;
-        has_wiki: boolean;
-        has_pages: boolean;
-        has_downloads: boolean;
-        has_discussions?: boolean;
-        archived: boolean;
-        disabled: boolean;
-        visibility?: string;
-        pushed_at: string | null;
-        created_at: string | null;
-        updated_at: string | null;
-        allow_rebase_merge?: boolean;
-        temp_clone_token?: string;
-        allow_squash_merge?: boolean;
-        allow_auto_merge?: boolean;
-        delete_branch_on_merge?: boolean;
-        allow_update_branch?: boolean;
-        use_squash_pr_title_as_default?: boolean;
-        squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-        squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-        merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-        merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-        allow_merge_commit?: boolean;
-        allow_forking?: boolean;
-        web_commit_signoff_required?: boolean;
-        open_issues: number;
-        watchers: number;
-        master_branch?: string;
-        starred_at?: string;
-        anonymous_access_enabled?: boolean;
-    }, ruleOptions: LicenseExistsOptions) => Promise<boolean>;
-    'readme/exists': (octokit: _octokit_core.Octokit & _octokit_plugin_rest_endpoint_methods_dist_types_types.Api & {
-        paginate: _octokit_plugin_paginate_rest.PaginateInterface;
-    }, repository: {
-        id: number;
-        node_id: string;
-        name: string;
-        full_name: string;
-        license: {
-            key: string;
-            name: string;
-            url: string | null;
-            spdx_id: string | null;
-            node_id: string;
-            html_url?: string;
-        } | null;
-        forks: number;
-        permissions?: {
-            admin: boolean;
-            pull: boolean;
-            triage?: boolean;
-            push: boolean;
-            maintain?: boolean;
-        };
-        owner: {
-            name?: string | null;
-            email?: string | null;
-            login: string;
-            id: number;
-            node_id: string;
-            avatar_url: string;
-            gravatar_id: string | null;
-            url: string;
-            html_url: string;
-            followers_url: string;
-            following_url: string;
-            gists_url: string;
-            starred_url: string;
-            subscriptions_url: string;
-            organizations_url: string;
-            repos_url: string;
-            events_url: string;
-            received_events_url: string;
-            type: string;
-            site_admin: boolean;
-            starred_at?: string;
-        };
-        private: boolean;
-        html_url: string;
-        description: string | null;
-        fork: boolean;
-        url: string;
-        archive_url: string;
-        assignees_url: string;
-        blobs_url: string;
-        branches_url: string;
-        collaborators_url: string;
-        comments_url: string;
-        commits_url: string;
-        compare_url: string;
-        contents_url: string;
-        contributors_url: string;
-        deployments_url: string;
-        downloads_url: string;
-        events_url: string;
-        forks_url: string;
-        git_commits_url: string;
-        git_refs_url: string;
-        git_tags_url: string;
-        git_url: string;
-        issue_comment_url: string;
-        issue_events_url: string;
-        issues_url: string;
-        keys_url: string;
-        labels_url: string;
-        languages_url: string;
-        merges_url: string;
-        milestones_url: string;
-        notifications_url: string;
-        pulls_url: string;
-        releases_url: string;
-        ssh_url: string;
-        stargazers_url: string;
-        statuses_url: string;
-        subscribers_url: string;
-        subscription_url: string;
-        tags_url: string;
-        teams_url: string;
-        trees_url: string;
-        clone_url: string;
-        mirror_url: string | null;
-        hooks_url: string;
-        svn_url: string;
-        homepage: string | null;
-        language: string | null;
-        forks_count: number;
-        stargazers_count: number;
-        watchers_count: number;
-        size: number;
-        default_branch: string;
-        open_issues_count: number;
-        is_template?: boolean;
-        topics?: string[];
-        has_issues: boolean;
-        has_projects: boolean;
-        has_wiki: boolean;
-        has_pages: boolean;
-        has_downloads: boolean;
-        has_discussions?: boolean;
-        archived: boolean;
-        disabled: boolean;
-        visibility?: string;
-        pushed_at: string | null;
-        created_at: string | null;
-        updated_at: string | null;
-        allow_rebase_merge?: boolean;
-        temp_clone_token?: string;
-        allow_squash_merge?: boolean;
-        allow_auto_merge?: boolean;
-        delete_branch_on_merge?: boolean;
-        allow_update_branch?: boolean;
-        use_squash_pr_title_as_default?: boolean;
-        squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-        squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-        merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-        merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-        allow_merge_commit?: boolean;
-        allow_forking?: boolean;
-        web_commit_signoff_required?: boolean;
-        open_issues: number;
-        watchers: number;
-        master_branch?: string;
-        starred_at?: string;
-        anonymous_access_enabled?: boolean;
-    }, ruleOptions: ReadmeExistsOptions) => Promise<boolean>;
+    'file-exists': (context: RuleContext, ruleOptions: FileExistsOptions) => Promise<{
+        errors: string[];
+    }>;
+    'file-forbidden': (context: RuleContext, ruleOptions: FileForbiddenOptions) => Promise<{
+        errors: string[];
+    }>;
+    'license/exists': (context: RuleContext, ruleOptions: LicenseExistsOptions) => Promise<{
+        errors: string[];
+    }>;
+    'readme/exists': (context: RuleContext, ruleOptions: ReadmeExistsOptions) => Promise<{
+        errors: string[];
+    }>;
 };
 
 type Octokit = ReturnType<typeof getOctokit>;
 type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
-interface RepolintResult {
+interface RunResult {
     repository: string;
     results: {
         rule: string;
-        passed: boolean;
+        errors?: string[];
+        warnings?: string[];
     }[];
 }
-declare function runRulesForRepo(octokit: Octokit, repo: Repository, config: Config): Promise<RepolintResult>;
-declare function run(octokit: Octokit, config: Config): Promise<RepolintResult[]>;
+declare function runRulesForRepo(octokit: Octokit, repo: Repository, config: Config): Promise<RunResult>;
+declare function run(octokit: Octokit, config: Config): Promise<RunResult[]>;
 
-export { type Config, type Octokit, type RepolintResult, type Repository, configSchema, fileExists, getConfig, licenseExists, readmeExists, rulesMapper, run, runRulesForRepo };
+export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, fileExists, fileForbidden, getConfig, licenseExists, readmeExists, rulesMapper, run, runRulesForRepo };

@@ -242,22 +242,89 @@ describe('fileForbidden', () => {
       expect(mockGetContent).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('type option', () => {
+    it('should find a directory when type is directory', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'node_modules', type: 'dir' },
+          { name: 'README.md', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: 'node_modules', type: 'directory' });
+      expect(result).toEqual({ errors: ['node_modules should not exist'] });
+    });
+
+    it('should not find a file when type is directory', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'node_modules', type: 'dir' },
+          { name: '.DS_Store', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: '.DS_Store', type: 'directory' });
+      expect(result).toEqual({ errors: [] });
+    });
+
+    it('should find either file or directory when type is any', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'node_modules', type: 'dir' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: 'node_modules', type: 'any' });
+      expect(result).toEqual({ errors: ['node_modules should not exist'] });
+    });
+
+    it('should default to file type', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'node_modules', type: 'dir' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileForbidden(context, { path: 'node_modules' });
+      expect(result).toEqual({ errors: [] });
+    });
+  });
 });
 
 describe('FileForbiddenOptionsSchema', () => {
   it('should parse valid options with path only', () => {
     const result = FileForbiddenOptionsSchema.parse({ path: '.DS_Store' });
-    expect(result).toEqual({ path: '.DS_Store', caseSensitive: false });
+    expect(result).toEqual({ path: '.DS_Store', caseSensitive: false, type: 'file' });
   });
 
   it('should parse valid options with caseSensitive: true', () => {
     const result = FileForbiddenOptionsSchema.parse({ path: '.DS_Store', caseSensitive: true });
-    expect(result).toEqual({ path: '.DS_Store', caseSensitive: true });
+    expect(result).toEqual({ path: '.DS_Store', caseSensitive: true, type: 'file' });
   });
 
   it('should default caseSensitive to false', () => {
     const result = FileForbiddenOptionsSchema.parse({ path: '.DS_Store' });
     expect(result.caseSensitive).toBe(false);
+  });
+
+  it('should default type to file', () => {
+    const result = FileForbiddenOptionsSchema.parse({ path: '.DS_Store' });
+    expect(result.type).toBe('file');
+  });
+
+  it('should parse type: directory', () => {
+    const result = FileForbiddenOptionsSchema.parse({ path: 'node_modules', type: 'directory' });
+    expect(result.type).toBe('directory');
+  });
+
+  it('should parse type: any', () => {
+    const result = FileForbiddenOptionsSchema.parse({ path: 'node_modules', type: 'any' });
+    expect(result.type).toBe('any');
   });
 
   it('should throw when path is missing', () => {
@@ -270,11 +337,15 @@ describe('FileForbiddenOptionsSchema', () => {
 
   it('should parse valid options with array of paths', () => {
     const result = FileForbiddenOptionsSchema.parse({ path: ['.env', '.env.local'] });
-    expect(result).toEqual({ path: ['.env', '.env.local'], caseSensitive: false });
+    expect(result).toEqual({ path: ['.env', '.env.local'], caseSensitive: false, type: 'file' });
   });
 
   it('should throw when array is empty', () => {
     expect(() => FileForbiddenOptionsSchema.parse({ path: [] })).toThrow();
+  });
+
+  it('should throw when type is invalid', () => {
+    expect(() => FileForbiddenOptionsSchema.parse({ path: 'src', type: 'invalid' })).toThrow();
   });
 });
 

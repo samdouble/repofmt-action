@@ -3,9 +3,12 @@ import { z } from 'zod';
 import { AlertLevelSchema } from '../utils/types';
 import type { RuleContext } from '../utils/context';
 
+export const EntryTypeSchema = z.enum(['file', 'directory', 'any']).default('file');
+
 export const FileExistsOptionsSchema = z.object({
   caseSensitive: z.boolean().default(false),
   path: z.union([z.string(), z.array(z.string()).min(1)]),
+  type: EntryTypeSchema,
 });
 
 export const FileExistsSchema = z.object({
@@ -16,13 +19,14 @@ export const FileExistsSchema = z.object({
 
 export type FileExistsOptions = z.input<typeof FileExistsOptionsSchema>;
 
-const checkFileExists = async (
+const checkEntryExists = async (
   context: RuleContext,
-  filePath: string,
+  entryPath: string,
   caseSensitive: boolean,
+  entryType: 'file' | 'directory' | 'any',
 ): Promise<boolean> => {
-  const dirPath = nodePath.dirname(filePath);
-  const fileName = nodePath.basename(filePath);
+  const dirPath = nodePath.dirname(entryPath);
+  const entryName = nodePath.basename(entryPath);
   const directoryPath = dirPath === '.' ? '' : dirPath;
 
   let contents;
@@ -36,15 +40,20 @@ const checkFileExists = async (
     return false;
   }
 
-  const file = contents
-    .filter(item => item.type === 'file')
+  const entry = contents
+    .filter(item => {
+      if (entryType === 'any') return true;
+      if (entryType === 'file') return item.type === 'file';
+      if (entryType === 'directory') return item.type === 'dir';
+      return false;
+    })
     .find(item => {
       return caseSensitive
-        ? item.name === fileName
-        : item.name.toLowerCase() === fileName.toLowerCase();
+        ? item.name === entryName
+        : item.name.toLowerCase() === entryName.toLowerCase();
     });
 
-  return !!file;
+  return !!entry;
 };
 
 export const fileExists = async (context: RuleContext, ruleOptions: FileExistsOptions) => {
@@ -61,8 +70,13 @@ export const fileExists = async (context: RuleContext, ruleOptions: FileExistsOp
     ? sanitizedRuleOptions.path
     : [sanitizedRuleOptions.path];
 
-  for (const filePath of paths) {
-    const exists = await checkFileExists(context, filePath, sanitizedRuleOptions.caseSensitive);
+  for (const entryPath of paths) {
+    const exists = await checkEntryExists(
+      context,
+      entryPath,
+      sanitizedRuleOptions.caseSensitive,
+      sanitizedRuleOptions.type,
+    );
     if (exists) {
       return { errors };
     }

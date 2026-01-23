@@ -323,22 +323,89 @@ describe('fileExists', () => {
       expect(result).toEqual({ errors: ['one of [config.yml, config.yaml] not found'] });
     });
   });
+
+  describe('type option', () => {
+    it('should find a directory when type is directory', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'src', type: 'dir' },
+          { name: 'README.md', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: 'src', type: 'directory' });
+      expect(result).toEqual({ errors: [] });
+    });
+
+    it('should not find a file when type is directory', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'src', type: 'dir' },
+          { name: 'README.md', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: 'README.md', type: 'directory' });
+      expect(result).toEqual({ errors: ['README.md not found'] });
+    });
+
+    it('should find either file or directory when type is any', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'src', type: 'dir' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: 'src', type: 'any' });
+      expect(result).toEqual({ errors: [] });
+    });
+
+    it('should default to file type', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'src', type: 'dir' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: 'src' });
+      expect(result).toEqual({ errors: ['src not found'] });
+    });
+  });
 });
 
 describe('FileExistsOptionsSchema', () => {
   it('should parse valid options with path only', () => {
     const result = FileExistsOptionsSchema.parse({ path: 'README.md' });
-    expect(result).toEqual({ path: 'README.md', caseSensitive: false });
+    expect(result).toEqual({ path: 'README.md', caseSensitive: false, type: 'file' });
   });
 
   it('should parse valid options with caseSensitive: true', () => {
     const result = FileExistsOptionsSchema.parse({ path: 'README.md', caseSensitive: true });
-    expect(result).toEqual({ path: 'README.md', caseSensitive: true });
+    expect(result).toEqual({ path: 'README.md', caseSensitive: true, type: 'file' });
   });
 
   it('should default caseSensitive to false', () => {
     const result = FileExistsOptionsSchema.parse({ path: 'README.md' });
     expect(result.caseSensitive).toBe(false);
+  });
+
+  it('should default type to file', () => {
+    const result = FileExistsOptionsSchema.parse({ path: 'README.md' });
+    expect(result.type).toBe('file');
+  });
+
+  it('should parse type: directory', () => {
+    const result = FileExistsOptionsSchema.parse({ path: 'src', type: 'directory' });
+    expect(result.type).toBe('directory');
+  });
+
+  it('should parse type: any', () => {
+    const result = FileExistsOptionsSchema.parse({ path: 'src', type: 'any' });
+    expect(result.type).toBe('any');
   });
 
   it('should throw when path is missing', () => {
@@ -351,10 +418,14 @@ describe('FileExistsOptionsSchema', () => {
 
   it('should parse valid options with array of paths', () => {
     const result = FileExistsOptionsSchema.parse({ path: ['config.yml', 'config.yaml'] });
-    expect(result).toEqual({ path: ['config.yml', 'config.yaml'], caseSensitive: false });
+    expect(result).toEqual({ path: ['config.yml', 'config.yaml'], caseSensitive: false, type: 'file' });
   });
 
   it('should throw when array is empty', () => {
     expect(() => FileExistsOptionsSchema.parse({ path: [] })).toThrow();
+  });
+
+  it('should throw when type is invalid', () => {
+    expect(() => FileExistsOptionsSchema.parse({ path: 'src', type: 'invalid' })).toThrow();
   });
 });
