@@ -46,25 +46,27 @@ program
     try {
       const results = await run(octokit, config);
 
-      let hasFailures = false;
+      let totalErrors = 0;
+      let totalWarnings = 0;
+
       for (const repoResult of results) {
         console.log(`\n${repoResult.repository}`);
-        console.log('='.repeat(repoResult.repository.length));
 
         for (const { rule, errors, warnings } of repoResult.results) {
           for (const error of errors ?? []) {
             console.log(`  ❌ ${rule}: ${error}`);
+            totalErrors++;
           }
           for (const warning of warnings ?? []) {
             console.log(`  ⚠️ ${rule}: ${warning}`);
-          }
-          if (errors && errors.length > 0) {
-            hasFailures = true;
+            totalWarnings++;
           }
         }
       }
 
-      process.exit(hasFailures ? 1 : 0);
+      console.log(`${totalErrors} error${totalErrors > 1 ? 's' : ''}, ${totalWarnings} warning${totalWarnings > 1 ? 's' : ''}`);
+
+      process.exit(totalErrors > 0 ? 1 : 0);
     } catch (error) {
       console.error(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       process.exit(1);
