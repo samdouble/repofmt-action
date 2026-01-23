@@ -5,7 +5,7 @@ import type { RuleContext } from '../utils/context';
 
 export const ReadmeExistsOptionsSchema = z.object({
   caseSensitive: z.boolean().optional().default(false),
-  path: z.string().optional().default('README.md'),
+  path: z.union([z.string(), z.array(z.string()).min(1)]).optional().default('README.md'),
 });
 
 export const ReadmeExistsSchema = z.object({

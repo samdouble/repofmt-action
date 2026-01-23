@@ -174,4 +174,55 @@ describe('LicenseExistsOptionsSchema', () => {
   it('should throw when caseSensitive is not a boolean', () => {
     expect(() => LicenseExistsOptionsSchema.parse({ caseSensitive: 'true' })).toThrow();
   });
+
+  it('should parse options with array of paths', () => {
+    const result = LicenseExistsOptionsSchema.parse({ path: ['LICENSE', 'LICENSE.md'] });
+    expect(result).toEqual({ path: ['LICENSE', 'LICENSE.md'], caseSensitive: false });
+  });
+
+  it('should throw when array is empty', () => {
+    expect(() => LicenseExistsOptionsSchema.parse({ path: [] })).toThrow();
+  });
+});
+
+describe('licenseExists with alternative paths', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should pass when first alternative exists', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: 'LICENSE', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await licenseExists(context, { path: ['LICENSE', 'LICENSE.md'] });
+    expect(result).toEqual({ errors: [] });
+  });
+
+  it('should pass when second alternative exists', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: 'LICENSE.md', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await licenseExists(context, { path: ['LICENSE', 'LICENSE.md'] });
+    expect(result).toEqual({ errors: [] });
+  });
+
+  it('should fail when no alternatives exist', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: 'README.md', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await licenseExists(context, { path: ['LICENSE', 'LICENSE.md'] });
+    expect(result).toEqual({ errors: ['one of [LICENSE, LICENSE.md] not found'] });
+  });
 });

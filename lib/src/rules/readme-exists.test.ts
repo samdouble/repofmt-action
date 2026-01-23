@@ -213,4 +213,55 @@ describe('ReadmeExistsOptionsSchema', () => {
   it('should throw when caseSensitive is not a boolean', () => {
     expect(() => ReadmeExistsOptionsSchema.parse({ caseSensitive: 'true' })).toThrow();
   });
+
+  it('should parse options with array of paths', () => {
+    const result = ReadmeExistsOptionsSchema.parse({ path: ['README.md', 'README.rst'] });
+    expect(result).toEqual({ path: ['README.md', 'README.rst'], caseSensitive: false });
+  });
+
+  it('should throw when array is empty', () => {
+    expect(() => ReadmeExistsOptionsSchema.parse({ path: [] })).toThrow();
+  });
+});
+
+describe('readmeExists with alternative paths', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should pass when first alternative exists', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: 'README.md', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await readmeExists(context, { path: ['README.md', 'README.rst'] });
+    expect(result).toEqual({ errors: [] });
+  });
+
+  it('should pass when second alternative exists', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: 'README.rst', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await readmeExists(context, { path: ['README.md', 'README.rst'] });
+    expect(result).toEqual({ errors: [] });
+  });
+
+  it('should fail when no alternatives exist', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: 'package.json', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await readmeExists(context, { path: ['README.md', 'README.rst'] });
+    expect(result).toEqual({ errors: ['one of [README.md, README.rst] not found'] });
+  });
 });

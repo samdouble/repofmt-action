@@ -1,11 +1,11 @@
-import path from 'node:path';
+import nodePath from 'node:path';
 import { z } from 'zod';
 import { AlertLevelSchema } from '../utils/types';
 import type { RuleContext } from '../utils/context';
 
 export const FileExistsOptionsSchema = z.object({
   caseSensitive: z.boolean().default(false),
-  path: z.string(),
+  path: z.union([z.string(), z.array(z.string()).min(1)]),
 });
 
 export const FileExistsSchema = z.object({
@@ -16,42 +16,60 @@ export const FileExistsSchema = z.object({
 
 export type FileExistsOptions = z.input<typeof FileExistsOptionsSchema>;
 
-export const fileExists = async (context: RuleContext, ruleOptions: FileExistsOptions) => {
-  const errors: string[] = [];
-
-  let sanitizedRuleOptions: FileExistsOptions;
-  try {
-    sanitizedRuleOptions = FileExistsOptionsSchema.parse(ruleOptions);
-  } catch (error) {
-    throw new Error(`Invalid rule options: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
-
-  const filePath = sanitizedRuleOptions.path;
-  const dirPath = path.dirname(filePath);
-  const fileName = path.basename(filePath);
+const checkFileExists = async (
+  context: RuleContext,
+  filePath: string,
+  caseSensitive: boolean,
+): Promise<boolean> => {
+  const dirPath = nodePath.dirname(filePath);
+  const fileName = nodePath.basename(filePath);
   const directoryPath = dirPath === '.' ? '' : dirPath;
 
   let contents;
   try {
     contents = await context.getContent(directoryPath);
   } catch {
-    errors.push(`${filePath} not found`);
-    return { errors };
+    return false;
   }
 
-  if (Array.isArray(contents)) {
-    const file = contents
-      .filter(item => item.type === 'file')
-      .find(item => {
-        return sanitizedRuleOptions.caseSensitive
-          ? item.name === fileName
-          : item.name.toLowerCase() === fileName.toLowerCase();
-      });
-    if (!file) {
-      errors.push(`${filePath} not found`);
-    }
-  } else {
-    errors.push(`Contents is not an array`);
+  if (!Array.isArray(contents)) {
+    return false;
   }
+
+  const file = contents
+    .filter(item => item.type === 'file')
+    .find(item => {
+      return caseSensitive
+        ? item.name === fileName
+        : item.name.toLowerCase() === fileName.toLowerCase();
+    });
+
+  return !!file;
+};
+
+export const fileExists = async (context: RuleContext, ruleOptions: FileExistsOptions) => {
+  const errors: string[] = [];
+
+  let sanitizedRuleOptions: z.output<typeof FileExistsOptionsSchema>;
+  try {
+    sanitizedRuleOptions = FileExistsOptionsSchema.parse(ruleOptions);
+  } catch (error) {
+    throw new Error(`Invalid rule options: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+
+  const paths = Array.isArray(sanitizedRuleOptions.path)
+    ? sanitizedRuleOptions.path
+    : [sanitizedRuleOptions.path];
+
+  for (const filePath of paths) {
+    const exists = await checkFileExists(context, filePath, sanitizedRuleOptions.caseSensitive);
+    if (exists) {
+      return { errors };
+    }
+  }
+
+  const pathsDisplay = paths.length === 1 ? paths[0] : `one of [${paths.join(', ')}]`;
+  errors.push(`${pathsDisplay} not found`);
+
   return { errors };
 };

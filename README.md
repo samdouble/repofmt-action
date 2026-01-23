@@ -95,11 +95,25 @@ The `file-exists` rule checks if a file exists in the repository.
 | Option          | Description                                                     | Required | Default      |
 |-----------------|-----------------------------------------------------------------|----------|--------------|
 | `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
-| `path`          | The path to the file.                                           | Yes      |              |
+| `path`          | The path to the file, or an array of alternative paths.         | Yes      |              |
+
+The `path` option supports nested paths (e.g., `.github/workflows/ci.yml`).
+
+You can also provide an array of alternative paths. The rule passes if **at least one** of the files exists:
+
+```json
+{
+  "name": "file-exists",
+  "level": "error",
+  "options": {
+    "path": ["config.yml", "config.yaml"]
+  }
+}
+```
 
 #### `file-forbidden`
 
-The `file-forbidden` rule checks that a file does NOT exist in the repository. This is useful for enforcing that certain files (like `.DS_Store`, `node_modules`, etc.) are not committed.
+The `file-forbidden` rule checks that a file does NOT exist in the repository. This is useful for enforcing that certain files (like `.DS_Store`, `.env`, etc.) are not committed.
 
 ```json
 {
@@ -115,7 +129,21 @@ The `file-forbidden` rule checks that a file does NOT exist in the repository. T
 | Option          | Description                                                     | Required | Default      |
 |-----------------|-----------------------------------------------------------------|----------|--------------|
 | `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
-| `path`          | The path to the file that should not exist.                     | Yes      |              |
+| `path`          | The path to the file(s) that should not exist.                  | Yes      |              |
+
+The `path` option supports nested paths (e.g., `src/config/secrets.json`).
+
+You can provide an array of paths to forbid multiple files:
+
+```json
+{
+  "name": "file-forbidden",
+  "level": "error",
+  "options": {
+    "path": [".env", ".env.local", ".env.production"]
+  }
+}
+```
 
 #### `license/exists`
 
@@ -123,7 +151,7 @@ The `license/exists` rule checks if a LICENSE file exists in the repository.
 
 ```json
 {
-  "rule": "license/exists",
+  "name": "license/exists",
   "level": "error",
   "options": {
     "caseSensitive": true,
@@ -135,7 +163,19 @@ The `license/exists` rule checks if a LICENSE file exists in the repository.
 | Option          | Description                                                     | Required | Default      |
 |-----------------|-----------------------------------------------------------------|----------|--------------|
 | `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
-| `path`          | The path to the file.                                           | No       | `LICENSE.md` |
+| `path`          | The path to the file, or an array of alternative paths.         | No       | `LICENSE.md` |
+
+You can provide an array of alternative paths:
+
+```json
+{
+  "name": "license/exists",
+  "level": "error",
+  "options": {
+    "path": ["LICENSE", "LICENSE.md", "LICENSE.txt"]
+  }
+}
+```
 
 #### `readme/exists`
 
@@ -143,7 +183,7 @@ The `readme/exists` rule checks if a README file exists in the repository.
 
 ```json
 {
-  "rule": "readme/exists",
+  "name": "readme/exists",
   "level": "error",
   "options": {
     "caseSensitive": true,
@@ -155,4 +195,16 @@ The `readme/exists` rule checks if a README file exists in the repository.
 | Option          | Description                                                     | Required | Default     |
 |-----------------|-----------------------------------------------------------------|----------|-------------|
 | `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`     |
-| `path`          | The path to the file.                                           | No       | `README.md` |
+| `path`          | The path to the file, or an array of alternative paths.         | No       | `README.md` |
+
+You can provide an array of alternative paths:
+
+```json
+{
+  "name": "readme/exists",
+  "level": "error",
+  "options": {
+    "path": ["README.md", "README.rst", "README.txt"]
+  }
+}
+```

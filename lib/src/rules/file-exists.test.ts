@@ -108,7 +108,7 @@ describe('fileExists', () => {
 
       const context = new RuleContext(mockOctokit, mockRepository);
       const result = await fileExists(context, { path: 'README.md' });
-      expect(result).toEqual({ errors: ['Contents is not an array'] });
+      expect(result).toEqual({ errors: ['README.md not found'] });
     });
   });
 
@@ -242,6 +242,87 @@ describe('fileExists', () => {
       expect(mockGetContent).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('alternative paths', () => {
+    it('should pass when first alternative exists', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'config.yml', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: ['config.yml', 'config.yaml'] });
+      expect(result).toEqual({ errors: [] });
+    });
+
+    it('should pass when second alternative exists', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'config.yaml', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: ['config.yml', 'config.yaml'] });
+      expect(result).toEqual({ errors: [] });
+    });
+
+    it('should fail when no alternatives exist', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'other.txt', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, { path: ['config.yml', 'config.yaml'] });
+      expect(result).toEqual({ errors: ['one of [config.yml, config.yaml] not found'] });
+    });
+
+    it('should work with nested paths', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'ci.yaml', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, {
+        path: ['.github/workflows/ci.yml', '.github/workflows/ci.yaml'],
+      });
+      expect(result).toEqual({ errors: [] });
+    });
+
+    it('should check alternatives in different directories', async () => {
+      mockGetContent
+        .mockResolvedValueOnce({ data: [] })
+        .mockResolvedValueOnce({
+          data: [{ name: 'config.yaml', type: 'file' }],
+        });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, {
+        path: ['config.yml', '.config/config.yaml'],
+      });
+      expect(result).toEqual({ errors: [] });
+    });
+
+    it('should respect caseSensitive option for alternatives', async () => {
+      mockGetContent.mockResolvedValue({
+        data: [
+          { name: 'CONFIG.yml', type: 'file' },
+        ],
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await fileExists(context, {
+        path: ['config.yml', 'config.yaml'],
+        caseSensitive: true,
+      });
+      expect(result).toEqual({ errors: ['one of [config.yml, config.yaml] not found'] });
+    });
+  });
 });
 
 describe('FileExistsOptionsSchema', () => {
@@ -266,5 +347,14 @@ describe('FileExistsOptionsSchema', () => {
 
   it('should throw when path is not a string', () => {
     expect(() => FileExistsOptionsSchema.parse({ path: 123 })).toThrow();
+  });
+
+  it('should parse valid options with array of paths', () => {
+    const result = FileExistsOptionsSchema.parse({ path: ['config.yml', 'config.yaml'] });
+    expect(result).toEqual({ path: ['config.yml', 'config.yaml'], caseSensitive: false });
+  });
+
+  it('should throw when array is empty', () => {
+    expect(() => FileExistsOptionsSchema.parse({ path: [] })).toThrow();
   });
 });

@@ -102,14 +102,14 @@ describe('fileForbidden', () => {
   });
 
   describe('when contents is not an array', () => {
-    it('should return error when getContent returns a single file object', async () => {
+    it('should return no errors when getContent returns a single file object', async () => {
       mockGetContent.mockResolvedValue({
         data: { name: '.DS_Store', type: 'file' },
       });
 
       const context = new RuleContext(mockOctokit, mockRepository);
       const result = await fileForbidden(context, { path: '.DS_Store' });
-      expect(result).toEqual({ errors: ['Contents is not an array'] });
+      expect(result).toEqual({ errors: [] });
     });
   });
 
@@ -266,5 +266,85 @@ describe('FileForbiddenOptionsSchema', () => {
 
   it('should throw when path is not a string', () => {
     expect(() => FileForbiddenOptionsSchema.parse({ path: 123 })).toThrow();
+  });
+
+  it('should parse valid options with array of paths', () => {
+    const result = FileForbiddenOptionsSchema.parse({ path: ['.env', '.env.local'] });
+    expect(result).toEqual({ path: ['.env', '.env.local'], caseSensitive: false });
+  });
+
+  it('should throw when array is empty', () => {
+    expect(() => FileForbiddenOptionsSchema.parse({ path: [] })).toThrow();
+  });
+});
+
+describe('fileForbidden with multiple paths', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should pass when none of the files exist', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: 'README.md', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await fileForbidden(context, { path: ['.env', '.env.local'] });
+    expect(result).toEqual({ errors: [] });
+  });
+
+  it('should fail when first file exists', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: '.env', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await fileForbidden(context, { path: ['.env', '.env.local'] });
+    expect(result).toEqual({ errors: ['.env should not exist'] });
+  });
+
+  it('should fail when second file exists', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: '.env.local', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await fileForbidden(context, { path: ['.env', '.env.local'] });
+    expect(result).toEqual({ errors: ['.env.local should not exist'] });
+  });
+
+  it('should report all files that exist in a single error', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: '.env', type: 'file' },
+        { name: '.env.local', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await fileForbidden(context, { path: ['.env', '.env.local'] });
+    expect(result).toEqual({
+      errors: ['[.env, .env.local] should not exist'],
+    });
+  });
+
+  it('should work with nested paths', async () => {
+    mockGetContent.mockResolvedValue({
+      data: [
+        { name: 'secrets.json', type: 'file' },
+      ],
+    });
+
+    const context = new RuleContext(mockOctokit, mockRepository);
+    const result = await fileForbidden(context, {
+      path: ['config/secrets.json', 'config/credentials.json'],
+    });
+    expect(result).toEqual({ errors: ['config/secrets.json should not exist'] });
   });
 });

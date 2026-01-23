@@ -5,7 +5,7 @@ import type { RuleContext } from '../utils/context';
 
 export const LicenseExistsOptionsSchema = z.object({
   caseSensitive: z.boolean().default(false),
-  path: z.string().default('LICENSE.md'),
+  path: z.union([z.string(), z.array(z.string()).min(1)]).default('LICENSE.md'),
 });
 
 export const LicenseExistsSchema = z.object({
