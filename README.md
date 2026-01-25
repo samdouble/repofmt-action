@@ -62,6 +62,11 @@ The action can be configured by creating a `repofmt.config.ts` file at the root 
 
 ```ts
 export default {
+  filters: {
+    visibility: 'public',
+    include: ['^my-org-', '^other-org-'],
+    exclude: ['^archived-'],
+  },
   rules: [
     {
       name: 'file-exists',
@@ -75,10 +80,36 @@ export default {
 };
 ```
 
+### Filters
+
+The `filters` option allows you to control which repositories are checked by the action.
+
+```ts
+{
+  filters: {
+    visibility: 'public',
+    include: ['^my-org-', '^other-org-'],
+    exclude: ['^archived-'],
+  }
+}
+```
+
+| Option           | Description                                                     | Required | Default      |
+|------------------|-----------------------------------------------------------------|----------|--------------|
+| `visibility`    | Filter repositories by visibility: `'public'`, `'private'`, or `'all'`. | No       | `'all'`      |
+| `include`        | Array of regex patterns to match repository names (matches both `name` and `full_name`). A repository is included if it matches **any** pattern in the array. | No       |              |
+| `exclude`        | Array of regex patterns to exclude repository names (matches both `name` and `full_name`). A repository is excluded if it matches **any** pattern in the array. | No       |              |
+
+**Note:** 
+- If `include` is provided, a repository must match **at least one** pattern to be included.
+- If `exclude` is provided, a repository matching **any** pattern will be excluded.
+- If both `include` and `exclude` are provided, a repository must match at least one `include` pattern AND not match any `exclude` pattern to be included.
+
 ### Rules
 
 #### `file-exists`
 
+<details>
 The `file-exists` rule checks if a file exists in the repository.
 
 ```json
@@ -124,9 +155,11 @@ You can use the `type` option to check for directories instead of files:
   }
 }
 ```
+</details>
 
 #### `file-forbidden`
 
+<details>
 The `file-forbidden` rule checks that a file does NOT exist in the repository. This is useful for enforcing that certain files (like `.DS_Store`, `.env`, etc.) are not committed.
 
 ```json
@@ -172,9 +205,11 @@ You can use the `type` option to forbid directories instead of files:
   }
 }
 ```
+</details>
 
 #### `github-actions/timeout-minutes`
 
+<details>
 The `github-actions/timeout-minutes` rule checks if the GitHub Actions timeout is set.
 
 ```json
@@ -190,9 +225,11 @@ The `github-actions/timeout-minutes` rule checks if the GitHub Actions timeout i
 | Option           | Description                                                     | Required | Default      |
 |------------------|-----------------------------------------------------------------|----------|--------------|
 | `maximum`        | Maximum allowed timeout value in minutes. If provided, the rule will check that all timeout values are lower than this maximum. | No       |              |
+</details>
 
 #### `license/exists`
 
+<details>
 The `license/exists` rule checks if a LICENSE file exists in the repository.
 
 ```json
@@ -222,9 +259,11 @@ You can provide an array of alternative paths:
   }
 }
 ```
+</details>
 
 #### `readme/exists`
 
+<details>
 The `readme/exists` rule checks if a README file exists in the repository.
 
 ```json
@@ -254,3 +293,4 @@ You can provide an array of alternative paths:
   }
 }
 ```
+</details>

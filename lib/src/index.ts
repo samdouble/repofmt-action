@@ -55,20 +55,62 @@ export async function runRulesForRepo(
   };
 }
 
+function matchesFilters(repo: Repository, filters?: Config['filters']): boolean {
+  if (!filters) {
+    return true;
+  }
+
+  if (filters.visibility) {
+    if (filters.visibility === 'public' && repo.private) {
+      return false;
+    }
+    if (filters.visibility === 'private' && !repo.private) {
+      return false;
+    }
+  }
+
+  if (filters.include && filters.include.length > 0) {
+    let matched = false;
+    for (const pattern of filters.include) {
+      const regex = new RegExp(pattern);
+      if (regex.test(repo.name) || regex.test(repo.full_name)) {
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      return false;
+    }
+  }
+
+  if (filters.exclude && filters.exclude.length > 0) {
+    for (const pattern of filters.exclude) {
+      const regex = new RegExp(pattern);
+      if (regex.test(repo.name) || regex.test(repo.full_name)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 export async function run(
   octokit: Octokit,
   config: Config,
 ): Promise<RunResult[]> {
+  const visibility = config.filters?.visibility ?? 'all';
   const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser({
-    visibility: 'all',
+    visibility,
     per_page: 100,
   });
 
   const results: RunResult[] = [];
 
   for (const repo of repos) {
-    const repoResult = await runRulesForRepo(octokit, repo, config);
-    results.push(repoResult);
+    if (matchesFilters(repo, config.filters)) {
+      const repoResult = await runRulesForRepo(octokit, repo, config);
+      results.push(repoResult);
+    }
   }
 
   return results;

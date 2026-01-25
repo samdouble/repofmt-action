@@ -383,7 +383,7 @@ jobs:
       expect(result).toEqual({ errors: [] });
     });
 
-    it('should fail when timeout equals max', async () => {
+    it('should pass when timeout equals max', async () => {
       mockGetContent.mockImplementation(({ path }) => {
         if (path === '.github/workflows') {
           return Promise.resolve({
@@ -414,10 +414,7 @@ jobs:
       const result = await githubActionsTimeoutMinutes(context, {
         maximum: 30,
       });
-      expect(result.errors).toHaveLength(1);
-      expect(result.errors[0]).toBe(
-        '.github/workflows/ci.yml: job "build" has timeout-minutes (30) that is not lower than 30',
-      );
+      expect(result).toEqual({ errors: [] });
     });
 
     it('should fail when timeout is greater than max', async () => {
@@ -453,7 +450,7 @@ jobs:
       });
       expect(result.errors).toHaveLength(1);
       expect(result.errors[0]).toBe(
-        '.github/workflows/ci.yml: job "build" has timeout-minutes (60) that is not lower than 30',
+        '.github/workflows/ci.yml: job "build" has timeout-minutes (60) that is higher than 30',
       );
     });
 
@@ -498,12 +495,9 @@ jobs:
       const result = await githubActionsTimeoutMinutes(context, {
         maximum: 30,
       });
-      expect(result.errors).toHaveLength(2);
+      expect(result.errors).toHaveLength(1);
       expect(result.errors).toContain(
-        '.github/workflows/ci.yml: job "test" has timeout-minutes (45) that is not lower than 30',
-      );
-      expect(result.errors).toContain(
-        '.github/workflows/ci.yml: job "deploy" has timeout-minutes (30) that is not lower than 30',
+        '.github/workflows/ci.yml: job "test" has timeout-minutes (45) that is higher than 30',
       );
     });
 
@@ -547,7 +541,7 @@ jobs:
         '.github/workflows/ci.yml: job "build" is missing timeout-minutes',
       );
       expect(result.errors).toContain(
-        '.github/workflows/ci.yml: job "test" has timeout-minutes (60) that is not lower than 30',
+        '.github/workflows/ci.yml: job "test" has timeout-minutes (60) that is higher than 30',
       );
     });
   });

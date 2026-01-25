@@ -5,8 +5,29 @@ import { pathToFileURL } from 'node:url';
 import { z } from 'zod';
 import { rulesConfigSchema } from '../rules';
 
+const regexPatternSchema = z.string().refine(
+  (pattern) => {
+    try {
+      new RegExp(pattern);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  {
+    message: 'Invalid regex pattern',
+  },
+);
+
+const filtersSchema = z.object({
+  visibility: z.enum(['public', 'private', 'all']).optional(),
+  include: z.array(regexPatternSchema).optional(),
+  exclude: z.array(regexPatternSchema).optional(),
+});
+
 export const configSchema = z.object({
   rules: rulesConfigSchema.optional().default([]),
+  filters: filtersSchema.optional(),
 });
 
 export type Config = z.infer<typeof configSchema>;
