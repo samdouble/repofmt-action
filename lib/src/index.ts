@@ -9,6 +9,7 @@ export { RuleContext } from './utils/context';
 export { rulesMapper } from './rulesMapper';
 export { fileExists } from './rules/file-exists';
 export { fileForbidden } from './rules/file-forbidden';
+export { githubActionsTimeoutMinutes } from './rules/github-actions-timeout-minutes';
 export { licenseExists } from './rules/license-exists';
 export { readmeExists } from './rules/readme-exists';
 
@@ -38,7 +39,7 @@ export async function runRulesForRepo(
     if (!ruleFunction) {
       throw new Error(`Rule ${rule} not found`);
     }
-    const { errors } = await ruleFunction(context, ruleOptions);
+    const { errors } = await ruleFunction(context, ruleOptions as never);
     if (errors.length > 0) {
       if (alertLevel === 'error') {
         results.push({ rule, errors });

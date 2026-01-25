@@ -13,6 +13,7 @@ export interface FileEntry {
 
 export class RuleContext {
   private contentCache: Map<string, RepoContent> = new Map();
+  private fileContentCache: Map<string, string> = new Map();
   private allFilesCache: FileEntry[] | null = null;
 
   constructor(
@@ -47,21 +48,17 @@ export class RuleContext {
 
     while (dirsToProcess.length > 0) {
       const dir = dirsToProcess.pop()!;
-      try {
-        const contents = await this.getContent(dir);
-        if (Array.isArray(contents)) {
-          for (const item of contents) {
-            const itemPath = dir ? `${dir}/${item.name}` : item.name;
-            if (item.type === 'file') {
-              files.push({ path: itemPath, name: item.name, type: 'file' });
-            } else if (item.type === 'dir') {
-              files.push({ path: itemPath, name: item.name, type: 'dir' });
-              dirsToProcess.push(itemPath);
-            }
+      const contents = await this.getContent(dir);
+      if (Array.isArray(contents)) {
+        for (const item of contents) {
+          const itemPath = dir ? `${dir}/${item.name}` : item.name;
+          if (item.type === 'file') {
+            files.push({ path: itemPath, name: item.name, type: 'file' });
+          } else if (item.type === 'dir') {
+            files.push({ path: itemPath, name: item.name, type: 'dir' });
+            dirsToProcess.push(itemPath);
           }
         }
-      } catch {
-        // Directory doesn't exist or inaccessible
       }
     }
 
@@ -69,8 +66,31 @@ export class RuleContext {
     return files;
   }
 
+  async getFileContent(path: string): Promise<string> {
+    const cacheKey = `${this.repository.full_name}:file:${path}`;
+
+    if (this.fileContentCache.has(cacheKey)) {
+      return this.fileContentCache.get(cacheKey)!;
+    }
+
+    const content = await this.getContent(path);
+
+    if (Array.isArray(content)) {
+      throw new Error(`Path ${path} is a directory, not a file`);
+    }
+
+    if (content.type !== 'file' || !('content' in content)) {
+      throw new Error(`Path ${path} is not a file`);
+    }
+
+    const decodedContent = Buffer.from(content.content, 'base64').toString('utf-8');
+    this.fileContentCache.set(cacheKey, decodedContent);
+    return decodedContent;
+  }
+
   clearCache(): void {
     this.contentCache.clear();
+    this.fileContentCache.clear();
     this.allFilesCache = null;
   }
 }

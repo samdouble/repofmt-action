@@ -32,7 +32,7 @@ jobs:
           npm run lint
       - name: Audit
         run: |
-          npm audit --audit-level=moderate
+          npm audit --audit-level=high
       - name: Test
         run: |
           npm test
