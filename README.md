@@ -173,6 +173,24 @@ You can use the `type` option to forbid directories instead of files:
 }
 ```
 
+#### `github-actions/timeout-minutes`
+
+The `github-actions/timeout-minutes` rule checks if the GitHub Actions timeout is set.
+
+```json
+{
+  "name": "github-actions/timeout-minutes",
+  "level": "error",
+  "options": {
+    "maximum": 30
+  }
+}
+```
+
+| Option           | Description                                                     | Required | Default      |
+|------------------|-----------------------------------------------------------------|----------|--------------|
+| `maximum`        | Maximum allowed timeout value in minutes. If provided, the rule will check that all timeout values are lower than this maximum. | No       |              |
+
 #### `license/exists`
 
 The `license/exists` rule checks if a LICENSE file exists in the repository.

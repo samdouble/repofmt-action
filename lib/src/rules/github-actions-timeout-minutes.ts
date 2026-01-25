@@ -3,7 +3,9 @@ import { z } from 'zod';
 import { AlertLevelSchema } from '../utils/types';
 import type { RuleContext } from '../utils/context';
 
-export const GithubActionsTimeoutMinutesOptionsSchema = z.object({});
+export const GithubActionsTimeoutMinutesOptionsSchema = z.object({
+  maximum: z.number().positive().optional(),
+});
 
 export const GithubActionsTimeoutMinutesSchema = z.object({
   name: z.literal('github-actions/timeout-minutes'),
@@ -25,7 +27,7 @@ interface Workflow {
 
 export const githubActionsTimeoutMinutes = async (
   context: RuleContext,
-  _ruleOptions: GithubActionsTimeoutMinutesOptions = {},
+  ruleOptions: GithubActionsTimeoutMinutesOptions = {},
 ) => {
   const errors: string[] = [];
   const workflowsPath = '.github/workflows';
@@ -71,8 +73,16 @@ export const githubActionsTimeoutMinutes = async (
     if (workflow?.jobs) {
       for (const jobName of Object.keys(workflow.jobs)) {
         const job = workflow.jobs[jobName];
-        if (job?.['timeout-minutes'] === undefined) {
+        const timeoutMinutes = job?.['timeout-minutes'];
+        if (timeoutMinutes === undefined) {
           errors.push(`${filePath}: job "${jobName}" is missing timeout-minutes`);
+        } else if (
+          ruleOptions.maximum !== undefined &&
+          timeoutMinutes > ruleOptions.maximum
+        ) {
+          errors.push(
+            `${filePath}: job "${jobName}" has timeout-minutes (${timeoutMinutes}) that is higher than ${ruleOptions.maximum}`,
+          );
         }
       }
     }
