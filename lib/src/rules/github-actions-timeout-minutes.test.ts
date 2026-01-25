@@ -347,4 +347,208 @@ jobs:
       expect(mockGetContent).toHaveBeenCalledTimes(2);
     });
   });
+
+  describe('when maximum option is provided', () => {
+    it('should pass when timeout is lower than max', async () => {
+      mockGetContent.mockImplementation(({ path }) => {
+        if (path === '.github/workflows') {
+          return Promise.resolve({
+            data: [{ name: 'ci.yml', type: 'file' }],
+          });
+        }
+        if (path === '.github/workflows/ci.yml') {
+          return Promise.resolve({
+            data: {
+              type: 'file',
+              content: Buffer.from(`
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+`).toString('base64'),
+            },
+          });
+        }
+        return Promise.reject(new Error('Not found'));
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await githubActionsTimeoutMinutes(context, {
+        maximum: 30,
+      });
+      expect(result).toEqual({ errors: [] });
+    });
+
+    it('should fail when timeout equals max', async () => {
+      mockGetContent.mockImplementation(({ path }) => {
+        if (path === '.github/workflows') {
+          return Promise.resolve({
+            data: [{ name: 'ci.yml', type: 'file' }],
+          });
+        }
+        if (path === '.github/workflows/ci.yml') {
+          return Promise.resolve({
+            data: {
+              type: 'file',
+              content: Buffer.from(`
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+`).toString('base64'),
+            },
+          });
+        }
+        return Promise.reject(new Error('Not found'));
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await githubActionsTimeoutMinutes(context, {
+        maximum: 30,
+      });
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0]).toBe(
+        '.github/workflows/ci.yml: job "build" has timeout-minutes (30) that is not lower than 30',
+      );
+    });
+
+    it('should fail when timeout is greater than max', async () => {
+      mockGetContent.mockImplementation(({ path }) => {
+        if (path === '.github/workflows') {
+          return Promise.resolve({
+            data: [{ name: 'ci.yml', type: 'file' }],
+          });
+        }
+        if (path === '.github/workflows/ci.yml') {
+          return Promise.resolve({
+            data: {
+              type: 'file',
+              content: Buffer.from(`
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+`).toString('base64'),
+            },
+          });
+        }
+        return Promise.reject(new Error('Not found'));
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await githubActionsTimeoutMinutes(context, {
+        maximum: 30,
+      });
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0]).toBe(
+        '.github/workflows/ci.yml: job "build" has timeout-minutes (60) that is not lower than 30',
+      );
+    });
+
+    it('should check multiple jobs against max', async () => {
+      mockGetContent.mockImplementation(({ path }) => {
+        if (path === '.github/workflows') {
+          return Promise.resolve({
+            data: [{ name: 'ci.yml', type: 'file' }],
+          });
+        }
+        if (path === '.github/workflows/ci.yml') {
+          return Promise.resolve({
+            data: {
+              type: 'file',
+              content: Buffer.from(`
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - run: npm test
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - run: npm run deploy
+`).toString('base64'),
+            },
+          });
+        }
+        return Promise.reject(new Error('Not found'));
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await githubActionsTimeoutMinutes(context, {
+        maximum: 30,
+      });
+      expect(result.errors).toHaveLength(2);
+      expect(result.errors).toContain(
+        '.github/workflows/ci.yml: job "test" has timeout-minutes (45) that is not lower than 30',
+      );
+      expect(result.errors).toContain(
+        '.github/workflows/ci.yml: job "deploy" has timeout-minutes (30) that is not lower than 30',
+      );
+    });
+
+    it('should still check for missing timeout-minutes when maxTimeoutMinutes is provided', async () => {
+      mockGetContent.mockImplementation(({ path }) => {
+        if (path === '.github/workflows') {
+          return Promise.resolve({
+            data: [{ name: 'ci.yml', type: 'file' }],
+          });
+        }
+        if (path === '.github/workflows/ci.yml') {
+          return Promise.resolve({
+            data: {
+              type: 'file',
+              content: Buffer.from(`
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - run: npm test
+`).toString('base64'),
+            },
+          });
+        }
+        return Promise.reject(new Error('Not found'));
+      });
+
+      const context = new RuleContext(mockOctokit, mockRepository);
+      const result = await githubActionsTimeoutMinutes(context, {
+        maximum: 30,
+      });
+      expect(result.errors).toHaveLength(2);
+      expect(result.errors).toContain(
+        '.github/workflows/ci.yml: job "build" is missing timeout-minutes',
+      );
+      expect(result.errors).toContain(
+        '.github/workflows/ci.yml: job "test" has timeout-minutes (60) that is not lower than 30',
+      );
+    });
+  });
 });
