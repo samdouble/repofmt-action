@@ -357,5 +357,169 @@ describe('run', () => {
       expect(results).toHaveLength(1);
       expect(results[0].repository).toBe('test-owner/active-repo');
     });
+
+    it('should filter by organization', async () => {
+      const org1Repo = {
+        ...mockRepository,
+        name: 'repo1',
+        full_name: 'org1/repo1',
+        owner: { login: 'org1' },
+      };
+      const org2Repo = {
+        ...mockRepository,
+        name: 'repo2',
+        full_name: 'org2/repo2',
+        owner: { login: 'org2' },
+      };
+      const userRepo = {
+        ...mockRepository,
+        name: 'repo3',
+        full_name: 'user/repo3',
+        owner: { login: 'user' },
+      };
+
+      mockListRepos.mockResolvedValue({
+        data: [org1Repo, org2Repo, userRepo],
+      });
+      mockGetContent.mockResolvedValue({ data: [] });
+
+      const config: Config = {
+        rules: [],
+        filters: {
+          organizations: ['org1'],
+        },
+      };
+
+      const results = await run(mockOctokit, config);
+
+      expect(results).toHaveLength(1);
+      expect(results[0].repository).toBe('org1/repo1');
+    });
+
+    it('should filter by multiple organizations', async () => {
+      const org1Repo = {
+        ...mockRepository,
+        name: 'repo1',
+        full_name: 'org1/repo1',
+        owner: { login: 'org1' },
+      };
+      const org2Repo = {
+        ...mockRepository,
+        name: 'repo2',
+        full_name: 'org2/repo2',
+        owner: { login: 'org2' },
+      };
+      const org3Repo = {
+        ...mockRepository,
+        name: 'repo3',
+        full_name: 'org3/repo3',
+        owner: { login: 'org3' },
+      };
+      const userRepo = {
+        ...mockRepository,
+        name: 'repo4',
+        full_name: 'user/repo4',
+        owner: { login: 'user' },
+      };
+
+      mockListRepos.mockResolvedValue({
+        data: [org1Repo, org2Repo, org3Repo, userRepo],
+      });
+      mockGetContent.mockResolvedValue({ data: [] });
+
+      const config: Config = {
+        rules: [],
+        filters: {
+          organizations: ['org1', 'org2'],
+        },
+      };
+
+      const results = await run(mockOctokit, config);
+
+      expect(results).toHaveLength(2);
+      expect(results.map((r) => r.repository)).toContain('org1/repo1');
+      expect(results.map((r) => r.repository)).toContain('org2/repo2');
+    });
+
+    it('should combine organization and visibility filters', async () => {
+      const org1PublicRepo = {
+        ...mockRepository,
+        name: 'public-repo',
+        full_name: 'org1/public-repo',
+        owner: { login: 'org1' },
+        private: false,
+      };
+      const org1PrivateRepo = {
+        ...mockRepository,
+        name: 'private-repo',
+        full_name: 'org1/private-repo',
+        owner: { login: 'org1' },
+        private: true,
+      };
+      const org2PublicRepo = {
+        ...mockRepository,
+        name: 'public-repo',
+        full_name: 'org2/public-repo',
+        owner: { login: 'org2' },
+        private: false,
+      };
+
+      mockListRepos.mockResolvedValue({
+        data: [org1PublicRepo, org1PrivateRepo, org2PublicRepo],
+      });
+      mockGetContent.mockResolvedValue({ data: [] });
+
+      const config: Config = {
+        rules: [],
+        filters: {
+          organizations: ['org1'],
+          visibility: 'public',
+        },
+      };
+
+      const results = await run(mockOctokit, config);
+
+      expect(results).toHaveLength(1);
+      expect(results[0].repository).toBe('org1/public-repo');
+    });
+
+    it('should combine organization and include filters', async () => {
+      const org1Repo1 = {
+        ...mockRepository,
+        name: 'my-org-repo1',
+        full_name: 'org1/my-org-repo1',
+        owner: { login: 'org1' },
+      };
+      const org1Repo2 = {
+        ...mockRepository,
+        name: 'other-repo',
+        full_name: 'org1/other-repo',
+        owner: { login: 'org1' },
+      };
+      const org2Repo1 = {
+        ...mockRepository,
+        name: 'my-org-repo2',
+        full_name: 'org2/my-org-repo2',
+        owner: { login: 'org2' },
+      };
+
+      mockListRepos.mockResolvedValue({
+        data: [org1Repo1, org1Repo2, org2Repo1],
+      });
+      mockGetContent.mockResolvedValue({ data: [] });
+
+      const config: Config = {
+        rules: [],
+        filters: {
+          organizations: ['org1'],
+          include: ['^my-org-'],
+        },
+      };
+
+      const results = await run(mockOctokit, config);
+
+      expect(results).toHaveLength(1);
+      expect(results[0].repository).toBe('org1/my-org-repo1');
+    });
   });
 });

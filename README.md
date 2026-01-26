@@ -64,6 +64,7 @@ The action can be configured by creating a `repofmt.config.ts` file at the root 
 export default {
   filters: {
     visibility: 'public',
+    organizations: ['my-org', 'other-org'],
     include: ['^my-org-', '^other-org-'],
     exclude: ['^archived-'],
   },
@@ -88,6 +89,7 @@ The `filters` option allows you to control which repositories are checked by the
 {
   filters: {
     visibility: 'public',
+    organizations: ['my-org', 'other-org'],
     include: ['^my-org-', '^other-org-'],
     exclude: ['^archived-'],
   }
@@ -97,13 +99,11 @@ The `filters` option allows you to control which repositories are checked by the
 | Option           | Description                                                     | Required | Default      |
 |------------------|-----------------------------------------------------------------|----------|--------------|
 | `visibility`    | Filter repositories by visibility: `'public'`, `'private'`, or `'all'`. | No       | `'all'`      |
+| `organizations` | Array of organization names to include. A repository must belong to **one of** the specified organizations to be included. | No       |              |
 | `include`        | Array of regex patterns to match repository names (matches both `name` and `full_name`). A repository is included if it matches **any** pattern in the array. | No       |              |
 | `exclude`        | Array of regex patterns to exclude repository names (matches both `name` and `full_name`). A repository is excluded if it matches **any** pattern in the array. | No       |              |
 
-**Note:** 
-- If `include` is provided, a repository must match **at least one** pattern to be included.
-- If `exclude` is provided, a repository matching **any** pattern will be excluded.
-- If both `include` and `exclude` are provided, a repository must match at least one `include` pattern AND not match any `exclude` pattern to be included.
+- A repository must pass all specified filters to be included.
 
 ### Rules
 
