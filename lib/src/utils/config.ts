@@ -21,6 +21,7 @@ const regexPatternSchema = z.string().refine(
 
 const filtersSchema = z.object({
   visibility: z.enum(['public', 'private', 'all']).optional(),
+  organizations: z.array(z.string()).optional(),
   include: z.array(regexPatternSchema).optional(),
   exclude: z.array(regexPatternSchema).optional(),
 });

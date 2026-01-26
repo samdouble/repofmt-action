@@ -69,6 +69,12 @@ function matchesFilters(repo: Repository, filters?: Config['filters']): boolean 
     }
   }
 
+  if (filters.organizations && filters.organizations.length > 0) {
+    if (!filters.organizations.includes(repo.owner.login)) {
+      return false;
+    }
+  }
+
   if (filters.include && filters.include.length > 0) {
     let matched = false;
     for (const pattern of filters.include) {
