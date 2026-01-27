@@ -9,6 +9,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: lib
     steps:
       - uses: googleapis/release-please-action@v4
         with:
