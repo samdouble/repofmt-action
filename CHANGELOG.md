@@ -1,0 +1,42 @@
+# Changelog
+
+## 0.1.0 (2026-01-27)
+
+
+### Features
+
+* add a simple rule that checks existence of README file ([ac75dda](https://github.com/samdouble/repofmt-action/commit/ac75dda8be7975d29d5841006918eaf548e7c67d))
+* add repository filters ([537f460](https://github.com/samdouble/repofmt-action/commit/537f460ac47a6a877c785f1047257b5e2f444efd))
+* be able to specify an alerting level ([8914601](https://github.com/samdouble/repofmt-action/commit/8914601e640f5c34f5bb065859922c83ebdcaae1))
+* **file-contains:** added rule ([7eef11e](https://github.com/samdouble/repofmt-action/commit/7eef11e2f5cd2fc5320eb5bfb46ef89f2ff323e3))
+* **file-exists,file-forbidden:** added type option ([0993a79](https://github.com/samdouble/repofmt-action/commit/0993a795e24abe5ed085df7c3aa783218ca7a4f2))
+* **file-exists,file-forbidden:** allow for subpaths ([30bac47](https://github.com/samdouble/repofmt-action/commit/30bac479f1844fd5d2888a22757e187dd8ba087b))
+* **file-exists,file-forbidden:** support patterns ([b66626f](https://github.com/samdouble/repofmt-action/commit/b66626fe31e4ce7bf35c6c008c0f0adc57ed3890))
+* **file-exists:** added rule ([3fe2f95](https://github.com/samdouble/repofmt-action/commit/3fe2f9535b69ae6d35b8335616ca55590a680244))
+* **file-exists:** allow for alternative paths ([69d19c1](https://github.com/samdouble/repofmt-action/commit/69d19c16daac53bc0c7339e11abec81e9e5cd424))
+* **file-exists:** change caseInsensitive to caseSensitive ([725baac](https://github.com/samdouble/repofmt-action/commit/725baac819422f9fd26e6d88061ee1c980e2bc01))
+* **file-forbidden:** added rule ([12e8921](https://github.com/samdouble/repofmt-action/commit/12e89213dc681964f980a36d17ed354f1da78e8d))
+* **filters:** add archived filter ([911fca6](https://github.com/samdouble/repofmt-action/commit/911fca6427ab80673e4df5554a6b40e8a5d66901))
+* **filters:** add organizations filter ([a5de93b](https://github.com/samdouble/repofmt-action/commit/a5de93b50c906840c97c104ca4c10ad0dbcefca3))
+* for each repo, list the contents ([6077f1c](https://github.com/samdouble/repofmt-action/commit/6077f1cc6a0a9c45ddf5efe2d4e5453669c5a1bc))
+* **github-actions/timeout-minutes:** added maximum option ([75cad07](https://github.com/samdouble/repofmt-action/commit/75cad079a5b116b9c7d1d7cfd718fcf4b5c4aa53))
+* **github-actions/timeout-minutes:** added rule ([925441b](https://github.com/samdouble/repofmt-action/commit/925441b9f5fc229405deecf5a2ed354ec80f6f80))
+* have action and npm lib live in the same repo ([349b219](https://github.com/samdouble/repofmt-action/commit/349b2197042ea07042e65ac9780d555f7a96bfe3))
+* **license/exists:** added rule ([336874b](https://github.com/samdouble/repofmt-action/commit/336874b798c72fb3f27a14e7880f4a9f09c2816d))
+* list all repos in a user's account ([880d411](https://github.com/samdouble/repofmt-action/commit/880d4118c85509714c33380b3d83f54cf0ae7799))
+* load JS, TS, CJS or MJS config instead of plain JSON ([35f8084](https://github.com/samdouble/repofmt-action/commit/35f8084a811f46ac4dcf0e7a81ee2065dd160f16))
+* **readme-exists:** added options caseInsensitive and path ([fa4a90a](https://github.com/samdouble/repofmt-action/commit/fa4a90ac317e0d1b4a2f831bffec61911299118c))
+* show total warnings and errors at the end ([602556e](https://github.com/samdouble/repofmt-action/commit/602556e9407068bedb89b4776abaf7f8524f8f02))
+* simply list repos in an organization ([db09ba8](https://github.com/samdouble/repofmt-action/commit/db09ba8ed688b1be7edd973e7afa40166c82460b))
+
+
+### Bug Fixes
+
+* allow rules to be used more than once in the config ([af0fea0](https://github.com/samdouble/repofmt-action/commit/af0fea099c90ef3719f0b672b3291bedad98f96e))
+* fail if a rule is not found ([366c6da](https://github.com/samdouble/repofmt-action/commit/366c6daddd83cb1957a7837a64741fa95ec56474))
+* reinclude dist in committed folders ([0d3d75a](https://github.com/samdouble/repofmt-action/commit/0d3d75aaf9dafdcd1ef7a9620afe3ee829806663))
+
+
+### Miscellaneous Chores
+
+* release 0.1.0 ([f4425f4](https://github.com/samdouble/repofmt-action/commit/f4425f4d6967c0162014e23f62139bf96de76130))
