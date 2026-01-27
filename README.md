@@ -110,6 +110,76 @@ The `filters` option allows you to control which repositories are checked by the
 
 ### Rules
 
+#### `file-contains`
+
+<details>
+The `file-contains` rule checks if a file contains a specific string.
+
+```json
+{
+  "name": "file-contains",
+  "level": "error",
+  "options": {
+    "path": "README.md",
+    "contains": "MIT License",
+    "caseSensitive": false
+  }
+}
+```
+
+| Option          | Description                                                     | Required | Default      |
+|-----------------|-----------------------------------------------------------------|----------|--------------|
+| `path`          | The path to the file(s) to check, or an array of paths/glob patterns. | Yes      |              |
+| `contains`      | The string that the file(s) must contain.                      | Yes      |              |
+| `caseSensitive` | Whether the string matching should be case-sensitive.           | No       | `false`      |
+
+The `path` option supports:
+- Single file paths (e.g., `README.md`, `.github/workflows/ci.yml`)
+- Glob patterns (e.g., `**/*.md`, `src/**/*.ts`)
+- Arrays of paths/patterns (e.g., `['README.md', 'LICENSE']`, `['**/*.md', '**/*.txt']`)
+
+When using glob patterns or arrays, **all** matching files must contain the specified string.
+
+Example: Check if a README contains a license notice:
+
+```json
+{
+  "name": "file-contains",
+  "level": "error",
+  "options": {
+    "path": "README.md",
+    "contains": "MIT License"
+  }
+}
+```
+
+Example: Check if all markdown files contain a license notice:
+
+```json
+{
+  "name": "file-contains",
+  "level": "error",
+  "options": {
+    "path": "**/*.md",
+    "contains": "MIT License"
+  }
+}
+```
+
+Example: Check multiple specific files:
+
+```json
+{
+  "name": "file-contains",
+  "level": "error",
+  "options": {
+    "path": ["README.md", "LICENSE"],
+    "contains": "MIT"
+  }
+}
+```
+</details>
+
 #### `file-exists`
 
 <details>

@@ -7,6 +7,7 @@ import { RuleContext } from './utils/context';
 export { getConfig, configSchema, type Config } from './utils/config';
 export { RuleContext } from './utils/context';
 export { rulesMapper } from './rulesMapper';
+export { fileContains } from './rules/file-contains';
 export { fileExists } from './rules/file-exists';
 export { fileForbidden } from './rules/file-forbidden';
 export { githubActionsTimeoutMinutes } from './rules/github-actions-timeout-minutes';
