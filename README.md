@@ -300,6 +300,52 @@ The `github-actions/timeout-minutes` rule checks if the GitHub Actions timeout i
 | `maximum`        | Maximum allowed timeout value in minutes. If provided, the rule will check that all timeout values are lower than this maximum. | No       |              |
 </details>
 
+#### `python/pyproject-dependencies-alphabetical-order`
+
+<details>
+The `python/pyproject-dependencies-alphabetical-order` rule checks if dependencies in `pyproject.toml` are in alphabetical order.
+
+```json
+{
+  "name": "python/pyproject-dependencies-alphabetical-order",
+  "level": "error",
+  "options": {
+    "path": "pyproject.toml",
+    "sections": ["project.dependencies", "project.optional-dependencies", "tool.poetry.dependencies"]
+  }
+}
+```
+
+| Option          | Description                                                     | Required | Default      |
+|-----------------|-----------------------------------------------------------------|----------|--------------|
+| `path`          | The path to the pyproject.toml file.                            | No       | `pyproject.toml` |
+| `sections`      | Array of dependency sections to check. Supported sections: `project.dependencies`, `project.optional-dependencies`, `tool.poetry.dependencies`. | No       | `["project.dependencies", "project.optional-dependencies", "tool.poetry.dependencies"]` |
+
+The rule checks that dependencies are sorted alphabetically by package name (ignoring version specifiers and extras). For `project.optional-dependencies`, it checks each optional dependency group separately.
+
+Example: Check if dependencies are in alphabetical order:
+
+```json
+{
+  "name": "python/pyproject-dependencies-alphabetical-order",
+  "level": "error",
+  "options": {}
+}
+```
+
+Example: Check only Poetry dependencies:
+
+```json
+{
+  "name": "python/pyproject-dependencies-alphabetical-order",
+  "level": "error",
+  "options": {
+    "sections": ["tool.poetry.dependencies"]
+  }
+}
+```
+</details>
+
 #### `license/exists`
 
 <details>

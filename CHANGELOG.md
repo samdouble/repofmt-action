@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/samdouble/repofmt-action/compare/v0.1.0...v0.2.0) (2026-01-27)
+
+
+### Features
+
+* **python/pyproject-dependencies-alphabetical-order:** added rule ([37b5fa7](https://github.com/samdouble/repofmt-action/commit/37b5fa70b607823df10c018bdaf1c079c03d839f))
+
 ## 0.1.0 (2026-01-27)
 
 

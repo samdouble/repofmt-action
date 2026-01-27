@@ -1,0 +1,16 @@
+{
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[javascript]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "files.associations": {
+    "**/src/**/*.js": "javascript",
+    "**/src/**/*.ts": "typescript"
+  }
+}
