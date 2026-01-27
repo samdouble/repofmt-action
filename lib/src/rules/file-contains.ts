@@ -1,17 +1,13 @@
-import { minimatch } from 'minimatch';
 import { z } from 'zod';
-import { AlertLevelSchema } from '../utils/types';
 import type { RuleContext } from '../utils/context';
+import { findMatchingFiles, isGlobPattern } from '../utils/files';
+import { AlertLevelSchema } from '../utils/types';
 
 export const FileContainsOptionsSchema = z.object({
   path: z.union([z.string(), z.array(z.string()).min(1)]),
   contains: z.string(),
   caseSensitive: z.boolean().default(false),
 });
-
-const isGlobPattern = (path: string): boolean => {
-  return /[*?[\]{}]/.test(path);
-};
 
 export const FileContainsSchema = z.object({
   name: z.literal('file-contains'),
@@ -20,24 +16,6 @@ export const FileContainsSchema = z.object({
 });
 
 export type FileContainsOptions = z.input<typeof FileContainsOptionsSchema>;
-
-const findMatchingFiles = async (
-  context: RuleContext,
-  pattern: string,
-  caseSensitive: boolean,
-): Promise<string[]> => {
-  const allFiles = await context.getAllFiles();
-
-  return allFiles
-    .filter(entry => entry.type === 'file')
-    .filter(entry =>
-      minimatch(entry.path, pattern, {
-        nocase: !caseSensitive,
-        dot: true,
-      }),
-    )
-    .map(entry => entry.path);
-};
 
 export const fileContains = async (
   context: RuleContext,

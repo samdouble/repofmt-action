@@ -1,6 +1,6 @@
 import type { getOctokit } from '@actions/github';
-import { fileContains } from './file-contains';
 import { RuleContext } from '../utils/context';
+import { fileContains } from './file-contains';
 
 const mockGetContent = jest.fn();
 const mockOctokit = {
@@ -265,7 +265,6 @@ describe('fileContains', () => {
 
   describe('when path is a glob pattern', () => {
     beforeEach(() => {
-      // Mock getAllFiles to return multiple files
       jest.spyOn(RuleContext.prototype, 'getAllFiles').mockResolvedValue([
         { path: 'README.md', name: 'README.md', type: 'file' },
         { path: 'docs/README.md', name: 'README.md', type: 'file' },

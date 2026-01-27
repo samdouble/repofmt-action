@@ -1,8 +1,9 @@
-import nodePath from 'node:path';
 import { minimatch } from 'minimatch';
+import nodePath from 'node:path';
 import { z } from 'zod';
-import { AlertLevelSchema } from '../utils/types';
 import type { RuleContext } from '../utils/context';
+import { isGlobPattern } from '../utils/files';
+import { AlertLevelSchema } from '../utils/types';
 
 export const EntryTypeSchema = z.enum(['file', 'directory', 'any']).default('file');
 
@@ -19,10 +20,6 @@ export const FileForbiddenSchema = z.object({
 });
 
 export type FileForbiddenOptions = z.input<typeof FileForbiddenOptionsSchema>;
-
-const isGlobPattern = (path: string): boolean => {
-  return /[*?[\]{}]/.test(path);
-};
 
 const checkEntryExists = async (
   context: RuleContext,

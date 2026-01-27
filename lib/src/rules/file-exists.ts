@@ -3,6 +3,7 @@ import { minimatch } from 'minimatch';
 import { z } from 'zod';
 import { AlertLevelSchema } from '../utils/types';
 import type { RuleContext } from '../utils/context';
+import { isGlobPattern } from '../utils/files';
 
 export const EntryTypeSchema = z.enum(['file', 'directory', 'any']).default('file');
 
@@ -19,10 +20,6 @@ export const FileExistsSchema = z.object({
 });
 
 export type FileExistsOptions = z.input<typeof FileExistsOptionsSchema>;
-
-const isGlobPattern = (path: string): boolean => {
-  return /[*?[\]{}]/.test(path);
-};
 
 const checkEntryExists = async (
   context: RuleContext,

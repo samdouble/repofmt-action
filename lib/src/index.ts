@@ -12,6 +12,7 @@ export { fileExists } from './rules/file-exists';
 export { fileForbidden } from './rules/file-forbidden';
 export { githubActionsTimeoutMinutes } from './rules/github-actions-timeout-minutes';
 export { licenseExists } from './rules/license-exists';
+export { pyprojectDependenciesAlphabeticalOrder } from './rules/pyproject-dependencies-alphabetical-order';
 export { readmeExists } from './rules/readme-exists';
 
 export type Octokit = ReturnType<typeof getOctokit>;
