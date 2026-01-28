@@ -6,6 +6,7 @@ import { GithubActionsTimeoutMinutesSchema } from './github-actions-timeout-minu
 import { LicenseExistsSchema } from './license-exists';
 import { PyprojectDependenciesAlphabeticalOrderSchema } from './pyproject-dependencies-alphabetical-order';
 import { ReadmeExistsSchema } from './readme-exists';
+import { RequirementsTxtDependenciesAlphabeticalOrderSchema } from './requirements-txt-dependencies-alphabetical-order';
 
 export const ruleConfigSchema = z.union([
   FileContainsSchema,
@@ -15,6 +16,7 @@ export const ruleConfigSchema = z.union([
   LicenseExistsSchema,
   PyprojectDependenciesAlphabeticalOrderSchema,
   ReadmeExistsSchema,
+  RequirementsTxtDependenciesAlphabeticalOrderSchema,
 ]);
 
 export const rulesConfigSchema = z.array(ruleConfigSchema);

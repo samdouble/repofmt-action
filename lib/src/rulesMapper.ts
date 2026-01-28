@@ -5,6 +5,7 @@ import { githubActionsTimeoutMinutes } from "./rules/github-actions-timeout-minu
 import { licenseExists } from "./rules/license-exists";
 import { pyprojectDependenciesAlphabeticalOrder } from "./rules/pyproject-dependencies-alphabetical-order";
 import { readmeExists } from "./rules/readme-exists";
+import { requirementsTxtDependenciesAlphabeticalOrder } from "./rules/requirements-txt-dependencies-alphabetical-order";
 
 export const rulesMapper = {
   'file-contains': fileContains,
@@ -13,5 +14,6 @@ export const rulesMapper = {
   'github-actions/timeout-minutes': githubActionsTimeoutMinutes,
   'license/exists': licenseExists,
   'python/pyproject-dependencies-alphabetical-order': pyprojectDependenciesAlphabeticalOrder,
+  'python/requirements-txt-dependencies-alphabetical-order': requirementsTxtDependenciesAlphabeticalOrder,
   'readme/exists': readmeExists,
 };

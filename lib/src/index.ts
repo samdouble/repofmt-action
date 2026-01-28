@@ -4,9 +4,6 @@ import { rulesMapper } from './rulesMapper';
 import { Config } from './utils/config';
 import { RuleContext } from './utils/context';
 
-export { getConfig, configSchema, type Config } from './utils/config';
-export { RuleContext } from './utils/context';
-export { rulesMapper } from './rulesMapper';
 export { fileContains } from './rules/file-contains';
 export { fileExists } from './rules/file-exists';
 export { fileForbidden } from './rules/file-forbidden';
@@ -14,6 +11,10 @@ export { githubActionsTimeoutMinutes } from './rules/github-actions-timeout-minu
 export { licenseExists } from './rules/license-exists';
 export { pyprojectDependenciesAlphabeticalOrder } from './rules/pyproject-dependencies-alphabetical-order';
 export { readmeExists } from './rules/readme-exists';
+export { requirementsTxtDependenciesAlphabeticalOrder } from './rules/requirements-txt-dependencies-alphabetical-order';
+export { rulesMapper } from './rulesMapper';
+export { configSchema, getConfig, type Config } from './utils/config';
+export { RuleContext } from './utils/context';
 
 export type Octokit = ReturnType<typeof getOctokit>;
 export type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];

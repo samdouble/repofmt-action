@@ -113,6 +113,8 @@ The `filters` option allows you to control which repositories are checked by the
 #### `file-contains`
 
 <details>
+<summary>file-contains</summary>
+
 The `file-contains` rule checks if a file contains a specific string.
 
 ```json
@@ -183,6 +185,8 @@ Example: Check multiple specific files:
 #### `file-exists`
 
 <details>
+<summary>file-exists</summary>
+
 The `file-exists` rule checks if a file exists in the repository.
 
 ```json
@@ -233,6 +237,8 @@ You can use the `type` option to check for directories instead of files:
 #### `file-forbidden`
 
 <details>
+<summary>file-forbidden</summary>
+
 The `file-forbidden` rule checks that a file does NOT exist in the repository. This is useful for enforcing that certain files (like `.DS_Store`, `.env`, etc.) are not committed.
 
 ```json
@@ -283,6 +289,8 @@ You can use the `type` option to forbid directories instead of files:
 #### `github-actions/timeout-minutes`
 
 <details>
+<summary>github-actions/timeout-minutes</summary>
+
 The `github-actions/timeout-minutes` rule checks if the GitHub Actions timeout is set.
 
 ```json
@@ -300,9 +308,47 @@ The `github-actions/timeout-minutes` rule checks if the GitHub Actions timeout i
 | `maximum`        | Maximum allowed timeout value in minutes. If provided, the rule will check that all timeout values are lower than this maximum. | No       |              |
 </details>
 
+#### `license/exists`
+
+<details>
+<summary>license/exists</summary>
+
+The `license/exists` rule checks if a LICENSE file exists in the repository.
+
+```json
+{
+  "name": "license/exists",
+  "level": "error",
+  "options": {
+    "caseSensitive": true,
+    "path": "LICENSE.md"
+  }
+}
+```
+
+| Option          | Description                                                     | Required | Default      |
+|-----------------|-----------------------------------------------------------------|----------|--------------|
+| `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
+| `path`          | The path to the file, or an array of alternative paths.         | No       | `LICENSE.md` |
+
+You can provide an array of alternative paths:
+
+```json
+{
+  "name": "license/exists",
+  "level": "error",
+  "options": {
+    "path": ["LICENSE", "LICENSE.md", "LICENSE.txt"]
+  }
+}
+```
+</details>
+
 #### `python/pyproject-dependencies-alphabetical-order`
 
 <details>
+<summary>python/pyproject-dependencies-alphabetical-order</summary>
+
 The `python/pyproject-dependencies-alphabetical-order` rule checks if dependencies in `pyproject.toml` are in alphabetical order.
 
 ```json
@@ -346,35 +392,52 @@ Example: Check only Poetry dependencies:
 ```
 </details>
 
-#### `license/exists`
+#### `python/requirements-txt-dependencies-alphabetical-order`
 
 <details>
-The `license/exists` rule checks if a LICENSE file exists in the repository.
+<summary>python/requirements-txt-dependencies-alphabetical-order</summary>
+
+The `python/requirements-txt-dependencies-alphabetical-order` rule checks if dependencies in `requirements.txt` are in alphabetical order.
 
 ```json
 {
-  "name": "license/exists",
+  "name": "python/requirements-txt-dependencies-alphabetical-order",
   "level": "error",
   "options": {
-    "caseSensitive": true,
-    "path": "LICENSE.md"
+    "path": "requirements.txt"
   }
 }
 ```
 
 | Option          | Description                                                     | Required | Default      |
 |-----------------|-----------------------------------------------------------------|----------|--------------|
-| `caseSensitive` | Whether to check if the file exists in a case-sensitive manner. | No       | `false`      |
-| `path`          | The path to the file, or an array of alternative paths.         | No       | `LICENSE.md` |
+| `path`          | The path to the requirements.txt file.                         | No       | `requirements.txt` |
 
-You can provide an array of alternative paths:
+The rule checks that dependencies are sorted alphabetically by package name (ignoring version specifiers, extras, and comments). It handles:
+- Standard packages: `package`, `package==1.0.0`, `package>=1.0.0`, `package[extra]>=1.0.0`
+- Editable installs: `-e .`, `-e ./local-package`
+- Git URLs: `git+https://github.com/user/repo.git`, `git+https://github.com/user/repo.git@branch#egg=package-name`
+- File paths: `./local-package`, `/path/to/package`
+- Comments and empty lines are ignored
+
+Example: Check if dependencies are in alphabetical order:
 
 ```json
 {
-  "name": "license/exists",
+  "name": "python/requirements-txt-dependencies-alphabetical-order",
+  "level": "error",
+  "options": {}
+}
+```
+
+Example: Check a custom requirements file:
+
+```json
+{
+  "name": "python/requirements-txt-dependencies-alphabetical-order",
   "level": "error",
   "options": {
-    "path": ["LICENSE", "LICENSE.md", "LICENSE.txt"]
+    "path": "requirements-dev.txt"
   }
 }
 ```
@@ -383,6 +446,8 @@ You can provide an array of alternative paths:
 #### `readme/exists`
 
 <details>
+<summary>readme/exists</summary>
+
 The `readme/exists` rule checks if a README file exists in the repository.
 
 ```json
