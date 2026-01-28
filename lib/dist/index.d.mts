@@ -83,6 +83,15 @@ declare const configSchema: z.ZodObject<{
             caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             path: z.ZodDefault<z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>>;
         }, z.core.$strip>;
+    }, z.core.$strip>, z.ZodObject<{
+        name: z.ZodLiteral<"python/requirements-txt-dependencies-alphabetical-order">;
+        level: z.ZodEnum<{
+            error: "error";
+            warning: "warning";
+        }>;
+        options: z.ZodOptional<z.ZodObject<{
+            path: z.ZodDefault<z.ZodString>;
+        }, z.core.$strip>>;
     }, z.core.$strip>]>>>>;
     filters: z.ZodOptional<z.ZodObject<{
         archived: z.ZodOptional<z.ZodBoolean>;
@@ -120,52 +129,13 @@ declare class RuleContext {
     clearCache(): void;
 }
 
-declare const ReadmeExistsOptionsSchema: z.ZodObject<{
-    caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-    path: z.ZodDefault<z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>>;
-}, z.core.$strip>;
-type ReadmeExistsOptions = z.input<typeof ReadmeExistsOptionsSchema>;
-declare const readmeExists: (context: RuleContext, ruleOptions: ReadmeExistsOptions) => Promise<{
-    errors: string[];
-}>;
-
-declare const PyprojectDependenciesAlphabeticalOrderOptionsSchema: z.ZodObject<{
-    path: z.ZodDefault<z.ZodString>;
-    sections: z.ZodDefault<z.ZodArray<z.ZodString>>;
-}, z.core.$strip>;
-type PyprojectDependenciesAlphabeticalOrderOptions = z.input<typeof PyprojectDependenciesAlphabeticalOrderOptionsSchema>;
-declare const pyprojectDependenciesAlphabeticalOrder: (context: RuleContext, ruleOptions?: PyprojectDependenciesAlphabeticalOrderOptions) => Promise<{
-    errors: string[];
-}>;
-
-declare const LicenseExistsOptionsSchema: z.ZodObject<{
-    caseSensitive: z.ZodDefault<z.ZodBoolean>;
-    path: z.ZodDefault<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
-}, z.core.$strip>;
-type LicenseExistsOptions = z.input<typeof LicenseExistsOptionsSchema>;
-declare const licenseExists: (context: RuleContext, ruleOptions: LicenseExistsOptions) => Promise<{
-    errors: string[];
-}>;
-
-declare const GithubActionsTimeoutMinutesOptionsSchema: z.ZodObject<{
-    maximum: z.ZodOptional<z.ZodNumber>;
-}, z.core.$strip>;
-type GithubActionsTimeoutMinutesOptions = z.input<typeof GithubActionsTimeoutMinutesOptionsSchema>;
-declare const githubActionsTimeoutMinutes: (context: RuleContext, ruleOptions?: GithubActionsTimeoutMinutesOptions) => Promise<{
-    errors: string[];
-}>;
-
-declare const FileForbiddenOptionsSchema: z.ZodObject<{
-    caseSensitive: z.ZodDefault<z.ZodBoolean>;
+declare const FileContainsOptionsSchema: z.ZodObject<{
     path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
-    type: z.ZodDefault<z.ZodEnum<{
-        any: "any";
-        file: "file";
-        directory: "directory";
-    }>>;
+    contains: z.ZodString;
+    caseSensitive: z.ZodDefault<z.ZodBoolean>;
 }, z.core.$strip>;
-type FileForbiddenOptions = z.input<typeof FileForbiddenOptionsSchema>;
-declare const fileForbidden: (context: RuleContext, ruleOptions: FileForbiddenOptions) => Promise<{
+type FileContainsOptions = z.input<typeof FileContainsOptionsSchema>;
+declare const fileContains: (context: RuleContext, ruleOptions: FileContainsOptions) => Promise<{
     errors: string[];
 }>;
 
@@ -183,13 +153,60 @@ declare const fileExists: (context: RuleContext, ruleOptions: FileExistsOptions)
     errors: string[];
 }>;
 
-declare const FileContainsOptionsSchema: z.ZodObject<{
-    path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
-    contains: z.ZodString;
+declare const FileForbiddenOptionsSchema: z.ZodObject<{
     caseSensitive: z.ZodDefault<z.ZodBoolean>;
+    path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+    type: z.ZodDefault<z.ZodEnum<{
+        any: "any";
+        file: "file";
+        directory: "directory";
+    }>>;
 }, z.core.$strip>;
-type FileContainsOptions = z.input<typeof FileContainsOptionsSchema>;
-declare const fileContains: (context: RuleContext, ruleOptions: FileContainsOptions) => Promise<{
+type FileForbiddenOptions = z.input<typeof FileForbiddenOptionsSchema>;
+declare const fileForbidden: (context: RuleContext, ruleOptions: FileForbiddenOptions) => Promise<{
+    errors: string[];
+}>;
+
+declare const GithubActionsTimeoutMinutesOptionsSchema: z.ZodObject<{
+    maximum: z.ZodOptional<z.ZodNumber>;
+}, z.core.$strip>;
+type GithubActionsTimeoutMinutesOptions = z.input<typeof GithubActionsTimeoutMinutesOptionsSchema>;
+declare const githubActionsTimeoutMinutes: (context: RuleContext, ruleOptions?: GithubActionsTimeoutMinutesOptions) => Promise<{
+    errors: string[];
+}>;
+
+declare const LicenseExistsOptionsSchema: z.ZodObject<{
+    caseSensitive: z.ZodDefault<z.ZodBoolean>;
+    path: z.ZodDefault<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
+}, z.core.$strip>;
+type LicenseExistsOptions = z.input<typeof LicenseExistsOptionsSchema>;
+declare const licenseExists: (context: RuleContext, ruleOptions: LicenseExistsOptions) => Promise<{
+    errors: string[];
+}>;
+
+declare const PyprojectDependenciesAlphabeticalOrderOptionsSchema: z.ZodObject<{
+    path: z.ZodDefault<z.ZodString>;
+    sections: z.ZodDefault<z.ZodArray<z.ZodString>>;
+}, z.core.$strip>;
+type PyprojectDependenciesAlphabeticalOrderOptions = z.input<typeof PyprojectDependenciesAlphabeticalOrderOptionsSchema>;
+declare const pyprojectDependenciesAlphabeticalOrder: (context: RuleContext, ruleOptions?: PyprojectDependenciesAlphabeticalOrderOptions) => Promise<{
+    errors: string[];
+}>;
+
+declare const ReadmeExistsOptionsSchema: z.ZodObject<{
+    caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+    path: z.ZodDefault<z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>>;
+}, z.core.$strip>;
+type ReadmeExistsOptions = z.input<typeof ReadmeExistsOptionsSchema>;
+declare const readmeExists: (context: RuleContext, ruleOptions: ReadmeExistsOptions) => Promise<{
+    errors: string[];
+}>;
+
+declare const RequirementsTxtDependenciesAlphabeticalOrderOptionsSchema: z.ZodObject<{
+    path: z.ZodDefault<z.ZodString>;
+}, z.core.$strip>;
+type RequirementsTxtDependenciesAlphabeticalOrderOptions = z.input<typeof RequirementsTxtDependenciesAlphabeticalOrderOptionsSchema>;
+declare const requirementsTxtDependenciesAlphabeticalOrder: (context: RuleContext, ruleOptions?: RequirementsTxtDependenciesAlphabeticalOrderOptions) => Promise<{
     errors: string[];
 }>;
 
@@ -212,6 +229,9 @@ declare const rulesMapper: {
     'python/pyproject-dependencies-alphabetical-order': (context: RuleContext, ruleOptions?: PyprojectDependenciesAlphabeticalOrderOptions) => Promise<{
         errors: string[];
     }>;
+    'python/requirements-txt-dependencies-alphabetical-order': (context: RuleContext, ruleOptions?: RequirementsTxtDependenciesAlphabeticalOrderOptions) => Promise<{
+        errors: string[];
+    }>;
     'readme/exists': (context: RuleContext, ruleOptions: ReadmeExistsOptions) => Promise<{
         errors: string[];
     }>;
@@ -230,4 +250,4 @@ interface RunResult {
 declare function runRulesForRepo(octokit: Octokit, repo: Repository, config: Config): Promise<RunResult>;
 declare function run(octokit: Octokit, config: Config): Promise<RunResult[]>;
 
-export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, fileContains, fileExists, fileForbidden, getConfig, githubActionsTimeoutMinutes, licenseExists, pyprojectDependenciesAlphabeticalOrder, readmeExists, rulesMapper, run, runRulesForRepo };
+export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, fileContains, fileExists, fileForbidden, getConfig, githubActionsTimeoutMinutes, licenseExists, pyprojectDependenciesAlphabeticalOrder, readmeExists, requirementsTxtDependenciesAlphabeticalOrder, rulesMapper, run, runRulesForRepo };
