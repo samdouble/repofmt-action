@@ -302,7 +302,6 @@ requests
       const context = new RuleContext(mockOctokit, mockRepository);
       const result = await requirementsTxtDependenciesAlphabeticalOrder(context, {});
 
-      // The git URL should be sorted by the repo name (repo comes after pytest)
       expect(result).toEqual({ errors: [] });
     });
 
@@ -322,7 +321,6 @@ requests
       const context = new RuleContext(mockOctokit, mockRepository);
       const result = await requirementsTxtDependenciesAlphabeticalOrder(context, {});
 
-      // The git URL should be sorted by the egg name (my-package comes after pytest)
       expect(result).toEqual({ errors: [] });
     });
   });

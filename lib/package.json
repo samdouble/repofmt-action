@@ -1,6 +1,6 @@
 {
   "name": "repofmt",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "A CLI tool that checks consistency across repositories",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

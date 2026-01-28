@@ -2,6 +2,7 @@ import z from 'zod';
 import { FileContainsSchema } from './file-contains';
 import { FileExistsSchema } from './file-exists';
 import { FileForbiddenSchema } from './file-forbidden';
+import { FileNotContainsSchema } from './file-not-contains';
 import { GithubActionsTimeoutMinutesSchema } from './github-actions-timeout-minutes';
 import { LicenseExistsSchema } from './license-exists';
 import { PyprojectDependenciesAlphabeticalOrderSchema } from './pyproject-dependencies-alphabetical-order';
@@ -10,6 +11,7 @@ import { RequirementsTxtDependenciesAlphabeticalOrderSchema } from './requiremen
 
 export const ruleConfigSchema = z.union([
   FileContainsSchema,
+  FileNotContainsSchema,
   FileExistsSchema,
   FileForbiddenSchema,
   GithubActionsTimeoutMinutesSchema,

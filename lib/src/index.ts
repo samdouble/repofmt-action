@@ -7,6 +7,7 @@ import { RuleContext } from './utils/context';
 export { fileContains } from './rules/file-contains';
 export { fileExists } from './rules/file-exists';
 export { fileForbidden } from './rules/file-forbidden';
+export { fileNotContains } from './rules/file-not-contains';
 export { githubActionsTimeoutMinutes } from './rules/github-actions-timeout-minutes';
 export { licenseExists } from './rules/license-exists';
 export { pyprojectDependenciesAlphabeticalOrder } from './rules/pyproject-dependencies-alphabetical-order';
