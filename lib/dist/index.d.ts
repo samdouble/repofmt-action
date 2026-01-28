@@ -15,6 +15,17 @@ declare const configSchema: z.ZodObject<{
             caseSensitive: z.ZodDefault<z.ZodBoolean>;
         }, z.core.$strip>;
     }, z.core.$strip>, z.ZodObject<{
+        name: z.ZodLiteral<"file-not-contains">;
+        level: z.ZodEnum<{
+            error: "error";
+            warning: "warning";
+        }>;
+        options: z.ZodObject<{
+            path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+            contains: z.ZodString;
+            caseSensitive: z.ZodDefault<z.ZodBoolean>;
+        }, z.core.$strip>;
+    }, z.core.$strip>, z.ZodObject<{
         name: z.ZodLiteral<"file-exists">;
         level: z.ZodEnum<{
             error: "error";
@@ -167,6 +178,16 @@ declare const fileForbidden: (context: RuleContext, ruleOptions: FileForbiddenOp
     errors: string[];
 }>;
 
+declare const FileNotContainsOptionsSchema: z.ZodObject<{
+    path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+    contains: z.ZodString;
+    caseSensitive: z.ZodDefault<z.ZodBoolean>;
+}, z.core.$strip>;
+type FileNotContainsOptions = z.input<typeof FileNotContainsOptionsSchema>;
+declare const fileNotContains: (context: RuleContext, ruleOptions: FileNotContainsOptions) => Promise<{
+    errors: string[];
+}>;
+
 declare const GithubActionsTimeoutMinutesOptionsSchema: z.ZodObject<{
     maximum: z.ZodOptional<z.ZodNumber>;
 }, z.core.$strip>;
@@ -220,6 +241,9 @@ declare const rulesMapper: {
     'file-forbidden': (context: RuleContext, ruleOptions: FileForbiddenOptions) => Promise<{
         errors: string[];
     }>;
+    'file-not-contains': (context: RuleContext, ruleOptions: FileNotContainsOptions) => Promise<{
+        errors: string[];
+    }>;
     'github-actions/timeout-minutes': (context: RuleContext, ruleOptions?: GithubActionsTimeoutMinutesOptions) => Promise<{
         errors: string[];
     }>;
@@ -250,4 +274,4 @@ interface RunResult {
 declare function runRulesForRepo(octokit: Octokit, repo: Repository, config: Config): Promise<RunResult>;
 declare function run(octokit: Octokit, config: Config): Promise<RunResult[]>;
 
-export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, fileContains, fileExists, fileForbidden, getConfig, githubActionsTimeoutMinutes, licenseExists, pyprojectDependenciesAlphabeticalOrder, readmeExists, requirementsTxtDependenciesAlphabeticalOrder, rulesMapper, run, runRulesForRepo };
+export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, fileContains, fileExists, fileForbidden, fileNotContains, getConfig, githubActionsTimeoutMinutes, licenseExists, pyprojectDependenciesAlphabeticalOrder, readmeExists, requirementsTxtDependenciesAlphabeticalOrder, rulesMapper, run, runRulesForRepo };
