@@ -65,6 +65,16 @@ declare const configSchema: z.ZodObject<{
             maximum: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strip>>;
     }, z.core.$strip>, z.ZodObject<{
+        name: z.ZodLiteral<"json-has-keys">;
+        level: z.ZodEnum<{
+            error: "error";
+            warning: "warning";
+        }>;
+        options: z.ZodObject<{
+            path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+            keys: z.ZodArray<z.ZodString>;
+        }, z.core.$strip>;
+    }, z.core.$strip>, z.ZodObject<{
         name: z.ZodLiteral<"license/exists">;
         level: z.ZodEnum<{
             error: "error";
@@ -196,6 +206,15 @@ declare const githubActionsTimeoutMinutes: (context: RuleContext, ruleOptions?: 
     errors: string[];
 }>;
 
+declare const JsonHasKeysOptionsSchema: z.ZodObject<{
+    path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+    keys: z.ZodArray<z.ZodString>;
+}, z.core.$strip>;
+type JsonHasKeysOptions = z.input<typeof JsonHasKeysOptionsSchema>;
+declare const jsonHasKeys: (context: RuleContext, ruleOptions: JsonHasKeysOptions) => Promise<{
+    errors: string[];
+}>;
+
 declare const LicenseExistsOptionsSchema: z.ZodObject<{
     caseSensitive: z.ZodDefault<z.ZodBoolean>;
     path: z.ZodDefault<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
@@ -247,6 +266,9 @@ declare const rulesMapper: {
     'github-actions/timeout-minutes': (context: RuleContext, ruleOptions?: GithubActionsTimeoutMinutesOptions) => Promise<{
         errors: string[];
     }>;
+    'json-has-keys': (context: RuleContext, ruleOptions: JsonHasKeysOptions) => Promise<{
+        errors: string[];
+    }>;
     'license/exists': (context: RuleContext, ruleOptions: LicenseExistsOptions) => Promise<{
         errors: string[];
     }>;
@@ -274,4 +296,4 @@ interface RunResult {
 declare function runRulesForRepo(octokit: Octokit, repo: Repository, config: Config): Promise<RunResult>;
 declare function run(octokit: Octokit, config: Config): Promise<RunResult[]>;
 
-export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, fileContains, fileExists, fileForbidden, fileNotContains, getConfig, githubActionsTimeoutMinutes, licenseExists, pyprojectDependenciesAlphabeticalOrder, readmeExists, requirementsTxtDependenciesAlphabeticalOrder, rulesMapper, run, runRulesForRepo };
+export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, fileContains, fileExists, fileForbidden, fileNotContains, getConfig, githubActionsTimeoutMinutes, jsonHasKeys, licenseExists, pyprojectDependenciesAlphabeticalOrder, readmeExists, requirementsTxtDependenciesAlphabeticalOrder, rulesMapper, run, runRulesForRepo };
