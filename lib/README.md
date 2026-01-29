@@ -361,6 +361,89 @@ The `github-actions/timeout-minutes` rule checks if the GitHub Actions timeout i
 | `maximum`        | Maximum allowed timeout value in minutes. If provided, the rule will check that all timeout values are lower than this maximum. | No       |              |
 </details>
 
+#### `json-has-keys`
+
+<details>
+<summary>json-has-keys</summary>
+
+The `json-has-keys` rule checks if all specified keys are defined in JSON files. Keys can be nested using dot notation (e.g., `parent.child.grandchild`).
+
+```json
+{
+  "name": "json-has-keys",
+  "level": "error",
+  "options": {
+    "path": "package.json",
+    "keys": ["name", "version", "scripts.build"]
+  }
+}
+```
+
+| Option          | Description                                                     | Required | Default      |
+|-----------------|-----------------------------------------------------------------|----------|--------------|
+| `path`          | The path to the JSON file(s) to check, or an array of paths/glob patterns. | Yes      |              |
+| `keys`          | Array of keys to check. Use dot notation for nested keys (e.g., `"parent.child"`). | Yes      |              |
+
+The `path` option supports:
+- Single file paths (e.g., `package.json`, `tsconfig.json`)
+- Glob patterns (e.g., `**/*.json`, `config/*.json`)
+- Arrays of paths/patterns (e.g., `['package.json', 'package-lock.json']`)
+
+When using glob patterns or arrays, **all** matching files must contain all specified keys.
+
+Example: Check that package.json has required fields:
+
+```json
+{
+  "name": "json-has-keys",
+  "level": "error",
+  "options": {
+    "path": "package.json",
+    "keys": ["name", "version", "description"]
+  }
+}
+```
+
+Example: Check nested keys:
+
+```json
+{
+  "name": "json-has-keys",
+  "level": "error",
+  "options": {
+    "path": "tsconfig.json",
+    "keys": ["compilerOptions.target", "compilerOptions.module"]
+  }
+}
+```
+
+Example: Check multiple JSON files:
+
+```json
+{
+  "name": "json-has-keys",
+  "level": "error",
+  "options": {
+    "path": ["package.json", "package-lock.json"],
+    "keys": ["name", "version"]
+  }
+}
+```
+
+Example: Check all JSON files in a directory:
+
+```json
+{
+  "name": "json-has-keys",
+  "level": "error",
+  "options": {
+    "path": "config/**/*.json",
+    "keys": ["name"]
+  }
+}
+```
+</details>
+
 #### `license/exists`
 
 <details>

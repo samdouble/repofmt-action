@@ -4,6 +4,7 @@ import { FileExistsSchema } from './file-exists';
 import { FileForbiddenSchema } from './file-forbidden';
 import { FileNotContainsSchema } from './file-not-contains';
 import { GithubActionsTimeoutMinutesSchema } from './github-actions-timeout-minutes';
+import { JsonHasKeysSchema } from './json-has-keys';
 import { LicenseExistsSchema } from './license-exists';
 import { PyprojectDependenciesAlphabeticalOrderSchema } from './pyproject-dependencies-alphabetical-order';
 import { ReadmeExistsSchema } from './readme-exists';
@@ -15,6 +16,7 @@ export const ruleConfigSchema = z.union([
   FileExistsSchema,
   FileForbiddenSchema,
   GithubActionsTimeoutMinutesSchema,
+  JsonHasKeysSchema,
   LicenseExistsSchema,
   PyprojectDependenciesAlphabeticalOrderSchema,
   ReadmeExistsSchema,

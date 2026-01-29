@@ -8,10 +8,10 @@ const config: Config.InitialOptions = {
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
   coverageThreshold: {
     global: {
-      branches: 60,
-      functions: 30,
-      lines: 20,
-      statements: 20,
+      branches: 80,
+      functions: 60,
+      lines: 80,
+      statements: 80,
     },
   },
   passWithNoTests: true,

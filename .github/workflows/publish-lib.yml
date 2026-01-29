@@ -1,12 +1,12 @@
-name: Deploy
+name: Publish Lib
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'repofmt-v*'
 
 jobs:
-  deploy:
+  publish-lib:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     defaults:
@@ -21,9 +21,8 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 24.12.0
+          node-version: '24.12.0'
           registry-url: 'https://registry.npmjs.org'
       - name: Publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_API_TOKEN }}
-        run: npm publish --access=public
+        run: |
+          npm publish --access=public

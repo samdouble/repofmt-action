@@ -9,6 +9,7 @@ export { fileExists } from './rules/file-exists';
 export { fileForbidden } from './rules/file-forbidden';
 export { fileNotContains } from './rules/file-not-contains';
 export { githubActionsTimeoutMinutes } from './rules/github-actions-timeout-minutes';
+export { jsonHasKeys } from './rules/json-has-keys';
 export { licenseExists } from './rules/license-exists';
 export { pyprojectDependenciesAlphabeticalOrder } from './rules/pyproject-dependencies-alphabetical-order';
 export { readmeExists } from './rules/readme-exists';
