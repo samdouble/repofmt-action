@@ -8,7 +8,7 @@
 
 # repofmt-action
 
-This tool checks consistency across repositories.
+This tool checks consistency across repositories. If you maintain multiple repositories or if different teams maintain different repositories in your organization, it can become hard to ensure that all repositories are consistent.
 
 ## Usage
 

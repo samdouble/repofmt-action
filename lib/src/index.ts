@@ -14,6 +14,7 @@ export { licenseExists } from './rules/license-exists';
 export { pyprojectDependenciesAlphabeticalOrder } from './rules/pyproject-dependencies-alphabetical-order';
 export { readmeExists } from './rules/readme-exists';
 export { requirementsTxtDependenciesAlphabeticalOrder } from './rules/requirements-txt-dependencies-alphabetical-order';
+export { yamlHasKeys } from './rules/yaml-has-keys';
 export { rulesMapper } from './rulesMapper';
 export { configSchema, getConfig, type Config } from './utils/config';
 export { RuleContext } from './utils/context';

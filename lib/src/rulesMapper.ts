@@ -8,6 +8,7 @@ import { licenseExists } from "./rules/license-exists";
 import { pyprojectDependenciesAlphabeticalOrder } from "./rules/pyproject-dependencies-alphabetical-order";
 import { readmeExists } from "./rules/readme-exists";
 import { requirementsTxtDependenciesAlphabeticalOrder } from "./rules/requirements-txt-dependencies-alphabetical-order";
+import { yamlHasKeys } from "./rules/yaml-has-keys";
 
 export const rulesMapper = {
   'file-contains': fileContains,
@@ -20,4 +21,5 @@ export const rulesMapper = {
   'python/pyproject-dependencies-alphabetical-order': pyprojectDependenciesAlphabeticalOrder,
   'python/requirements-txt-dependencies-alphabetical-order': requirementsTxtDependenciesAlphabeticalOrder,
   'readme/exists': readmeExists,
+  'yaml-has-keys': yamlHasKeys,
 };

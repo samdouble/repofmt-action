@@ -444,6 +444,89 @@ Example: Check all JSON files in a directory:
 ```
 </details>
 
+#### `yaml-has-keys`
+
+<details>
+<summary>yaml-has-keys</summary>
+
+The `yaml-has-keys` rule checks if all specified keys are defined in YAML files. Keys can be nested using dot notation (e.g., `parent.child.grandchild`).
+
+```json
+{
+  "name": "yaml-has-keys",
+  "level": "error",
+  "options": {
+    "path": "config.yml",
+    "keys": ["name", "version", "scripts.build"]
+  }
+}
+```
+
+| Option          | Description                                                     | Required | Default      |
+|-----------------|-----------------------------------------------------------------|----------|--------------|
+| `path`          | The path to the YAML file(s) to check, or an array of paths/glob patterns. | Yes      |              |
+| `keys`          | Array of keys to check. Use dot notation for nested keys (e.g., `"parent.child"`). | Yes      |              |
+
+The `path` option supports:
+- Single file paths (e.g., `config.yml`, `.github/workflows/ci.yml`)
+- Glob patterns (e.g., `**/*.yml`, `**/*.yaml`, `config/*.yaml`)
+- Arrays of paths/patterns (e.g., `['config.yml', 'app.yaml']`)
+
+When using glob patterns or arrays, **all** matching files must contain all specified keys.
+
+Example: Check that a config file has required fields:
+
+```json
+{
+  "name": "yaml-has-keys",
+  "level": "error",
+  "options": {
+    "path": "config.yml",
+    "keys": ["name", "version", "description"]
+  }
+}
+```
+
+Example: Check nested keys:
+
+```json
+{
+  "name": "yaml-has-keys",
+  "level": "error",
+  "options": {
+    "path": ".github/workflows/ci.yml",
+    "keys": ["on.push.branches", "jobs.build.steps"]
+  }
+}
+```
+
+Example: Check multiple YAML files:
+
+```json
+{
+  "name": "yaml-has-keys",
+  "level": "error",
+  "options": {
+    "path": ["config.yml", "app.yaml"],
+    "keys": ["name", "version"]
+  }
+}
+```
+
+Example: Check all YAML files in a directory:
+
+```json
+{
+  "name": "yaml-has-keys",
+  "level": "error",
+  "options": {
+    "path": "config/**/*.{yml,yaml}",
+    "keys": ["name"]
+  }
+}
+```
+</details>
+
 #### `license/exists`
 
 <details>

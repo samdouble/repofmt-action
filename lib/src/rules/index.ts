@@ -9,6 +9,7 @@ import { LicenseExistsSchema } from './license-exists';
 import { PyprojectDependenciesAlphabeticalOrderSchema } from './pyproject-dependencies-alphabetical-order';
 import { ReadmeExistsSchema } from './readme-exists';
 import { RequirementsTxtDependenciesAlphabeticalOrderSchema } from './requirements-txt-dependencies-alphabetical-order';
+import { YamlHasKeysSchema } from './yaml-has-keys';
 
 export const ruleConfigSchema = z.union([
   FileContainsSchema,
@@ -21,6 +22,7 @@ export const ruleConfigSchema = z.union([
   PyprojectDependenciesAlphabeticalOrderSchema,
   ReadmeExistsSchema,
   RequirementsTxtDependenciesAlphabeticalOrderSchema,
+  YamlHasKeysSchema,
 ]);
 
 export const rulesConfigSchema = z.array(ruleConfigSchema);
