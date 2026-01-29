@@ -27,19 +27,19 @@ export const getDependencyName = (line: string): string => {
     return extractPackageNameFromUrl(rest);
   }
 
-  // git URLs: git+https://..., git+ssh://..., etc.
+  // git URLs (git+https://..., git+ssh://..., etc.)
   if (trimmed.includes('git+') || trimmed.includes('@git+')) {
     return extractPackageNameFromUrl(trimmed);
   }
 
-  // File paths: ./local-package or /path/to/package
+  // File paths (./local-package, /path/to/package)
   if (trimmed.startsWith('.') || trimmed.startsWith('/')) {
     const parts = trimmed.split(/[/\\]/);
     const lastPart = parts[parts.length - 1];
     return lastPart.toLowerCase();
   }
 
-  // Standard format: package, package==1.0.0, package>=1.0.0, package[extra]>=1.0.0
+  // Standard (package, package==1.0.0, package>=1.0.0, package[extra]>=1.0.0)
   const match = trimmed.match(/^([a-zA-Z0-9_-]+(?:\[[^\]]+\])?)/);
   return match ? match[1].toLowerCase() : trimmed.toLowerCase();
 };
