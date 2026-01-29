@@ -113,6 +113,16 @@ declare const configSchema: z.ZodObject<{
         options: z.ZodOptional<z.ZodObject<{
             path: z.ZodDefault<z.ZodString>;
         }, z.core.$strip>>;
+    }, z.core.$strip>, z.ZodObject<{
+        name: z.ZodLiteral<"yaml-has-keys">;
+        level: z.ZodEnum<{
+            error: "error";
+            warning: "warning";
+        }>;
+        options: z.ZodObject<{
+            path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+            keys: z.ZodArray<z.ZodString>;
+        }, z.core.$strip>;
     }, z.core.$strip>]>>>>;
     filters: z.ZodOptional<z.ZodObject<{
         archived: z.ZodOptional<z.ZodBoolean>;
@@ -250,6 +260,15 @@ declare const requirementsTxtDependenciesAlphabeticalOrder: (context: RuleContex
     errors: string[];
 }>;
 
+declare const YamlHasKeysOptionsSchema: z.ZodObject<{
+    path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+    keys: z.ZodArray<z.ZodString>;
+}, z.core.$strip>;
+type YamlHasKeysOptions = z.input<typeof YamlHasKeysOptionsSchema>;
+declare const yamlHasKeys: (context: RuleContext, ruleOptions: YamlHasKeysOptions) => Promise<{
+    errors: string[];
+}>;
+
 declare const rulesMapper: {
     'file-contains': (context: RuleContext, ruleOptions: FileContainsOptions) => Promise<{
         errors: string[];
@@ -281,6 +300,9 @@ declare const rulesMapper: {
     'readme/exists': (context: RuleContext, ruleOptions: ReadmeExistsOptions) => Promise<{
         errors: string[];
     }>;
+    'yaml-has-keys': (context: RuleContext, ruleOptions: YamlHasKeysOptions) => Promise<{
+        errors: string[];
+    }>;
 };
 
 type Octokit = ReturnType<typeof getOctokit>;
@@ -296,4 +318,4 @@ interface RunResult {
 declare function runRulesForRepo(octokit: Octokit, repo: Repository, config: Config): Promise<RunResult>;
 declare function run(octokit: Octokit, config: Config): Promise<RunResult[]>;
 
-export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, fileContains, fileExists, fileForbidden, fileNotContains, getConfig, githubActionsTimeoutMinutes, jsonHasKeys, licenseExists, pyprojectDependenciesAlphabeticalOrder, readmeExists, requirementsTxtDependenciesAlphabeticalOrder, rulesMapper, run, runRulesForRepo };
+export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, fileContains, fileExists, fileForbidden, fileNotContains, getConfig, githubActionsTimeoutMinutes, jsonHasKeys, licenseExists, pyprojectDependenciesAlphabeticalOrder, readmeExists, requirementsTxtDependenciesAlphabeticalOrder, rulesMapper, run, runRulesForRepo, yamlHasKeys };
