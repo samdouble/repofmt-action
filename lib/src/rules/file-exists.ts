@@ -1,9 +1,10 @@
-import nodePath from 'node:path';
 import { minimatch } from 'minimatch';
+import nodePath from 'node:path';
 import { z } from 'zod';
-import { AlertLevelSchema } from '../utils/types';
+import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
 import { isGlobPattern } from '../utils/files';
+import { AlertLevelSchema } from '../utils/types';
 
 export const EntryTypeSchema = z.enum(['file', 'directory', 'any']).default('file');
 
@@ -16,6 +17,7 @@ export const FileExistsOptionsSchema = z.object({
 export const FileExistsSchema = z.object({
   name: z.literal('file-exists'),
   level: AlertLevelSchema,
+  exceptions: z.array(regexPatternSchema).optional(),
   options: FileExistsOptionsSchema,
 });
 

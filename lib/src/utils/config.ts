@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { z } from 'zod';
 import { rulesConfigSchema } from '../rules';
 
-const regexPatternSchema = z.string().refine(
+export const regexPatternSchema = z.string().refine(
   (pattern) => {
     try {
       new RegExp(pattern);

@@ -1,7 +1,8 @@
 import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
-import { AlertLevelSchema } from '../utils/types';
+import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
+import { AlertLevelSchema } from '../utils/types';
 
 export const GithubActionsTimeoutMinutesOptionsSchema = z.object({
   maximum: z.number().positive().optional(),
@@ -10,6 +11,7 @@ export const GithubActionsTimeoutMinutesOptionsSchema = z.object({
 export const GithubActionsTimeoutMinutesSchema = z.object({
   name: z.literal('github-actions/timeout-minutes'),
   level: AlertLevelSchema,
+  exceptions: z.array(regexPatternSchema).optional(),
   options: GithubActionsTimeoutMinutesOptionsSchema.optional(),
 });
 

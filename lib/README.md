@@ -91,6 +91,41 @@ The `filters` option allows you to control which repositories are checked by the
 
 ### Rules
 
+Each rule has the following structure:
+
+```ts
+{
+  name: 'rule-name',
+  level: 'error' | 'warning',
+  options: { /* rule-specific options */ },
+  exceptions?: string[] // Optional: array of regex patterns
+}
+```
+
+#### Common Rule Fields
+
+| Field       | Description                                                     | Required | Default      |
+|-------------|-----------------------------------------------------------------|----------|--------------|
+| `name`      | The name of the rule to apply.                                  | Yes      |              |
+| `level`     | The alert level: `'error'` or `'warning'`.                      | Yes      |              |
+| `options`   | Rule-specific configuration options.                            | Yes      |              |
+| `exceptions`| Array of regex patterns to exclude repositories from this rule. A repository is excluded if its `name` or `full_name` matches **any** pattern in the array. | No       |              |
+
+**Exceptions**: The `exceptions` field allows you to bypass a specific rule for certain repositories. This is useful when you want a rule to apply to most repositories but need to exclude specific ones. Exceptions are checked per-rule, so you can have different exceptions for different rules.
+
+Example: Skip a rule for legacy repositories:
+
+```ts
+{
+  name: 'file-exists',
+  level: 'error',
+  options: {
+    path: 'README.md',
+  },
+  exceptions: ['^legacy-', '^deprecated-'],
+}
+```
+
 #### `file-contains`
 
 <details>

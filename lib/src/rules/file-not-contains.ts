@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
 import { findMatchingFiles, isGlobPattern } from '../utils/files';
 import { AlertLevelSchema } from '../utils/types';
@@ -12,6 +13,7 @@ export const FileNotContainsOptionsSchema = z.object({
 export const FileNotContainsSchema = z.object({
   name: z.literal('file-not-contains'),
   level: AlertLevelSchema,
+  exceptions: z.array(regexPatternSchema).optional(),
   options: FileNotContainsOptionsSchema,
 });
 

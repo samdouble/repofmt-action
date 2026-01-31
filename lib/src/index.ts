@@ -31,6 +31,21 @@ export interface RunResult {
   }[];
 }
 
+function matchesExceptions(repo: Repository, exceptions?: string[]): boolean {
+  if (!exceptions || exceptions.length === 0) {
+    return false;
+  }
+
+  for (const pattern of exceptions) {
+    const regex = new RegExp(pattern);
+    if (regex.test(repo.name) || regex.test(repo.full_name)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export async function runRulesForRepo(
   octokit: Octokit,
   repo: Repository,
@@ -40,7 +55,12 @@ export async function runRulesForRepo(
   const context = new RuleContext(octokit, repo);
 
   for (const ruleConfig of config.rules ?? []) {
-    const { name: rule, level: alertLevel, options: ruleOptions } = ruleConfig;
+    const { name: rule, level: alertLevel, options: ruleOptions, exceptions } = ruleConfig;
+    
+    if (matchesExceptions(repo, exceptions)) {
+      continue;
+    }
+
     const ruleFunction = rulesMapper[rule as keyof typeof rulesMapper];
     if (!ruleFunction) {
       throw new Error(`Rule ${rule} not found`);
