@@ -3,7 +3,7 @@ name: Publish Action
 on:
   push:
     tags:
-      - 'repofmt-v*'
+      - 'v*'
 
 jobs:
   publish-lib:
@@ -15,8 +15,7 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@v4
         with:
-          release-type: node
-          path: lib
+          release-type: simple
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Node
