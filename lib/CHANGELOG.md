@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/samdouble/repofmt-action/compare/repofmt-v0.2.0...repofmt-v0.3.0) (2026-01-31)
+
+
+### Features
+
+* **readme/has-section:** added rule ([b8636f3](https://github.com/samdouble/repofmt-action/commit/b8636f3bc7dbd8dc7ad282935fc06a53e38e79a8))
+
 ## [0.2.0](https://github.com/samdouble/repofmt-action/compare/repofmt-v0.1.0...repofmt-v0.2.0) (2026-01-31)
 
 
