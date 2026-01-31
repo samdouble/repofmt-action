@@ -72,5 +72,4 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           target-branch: master
-          path: lib
           include-component-in-tag: true
