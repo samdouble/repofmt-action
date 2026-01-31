@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/samdouble/repofmt-action/compare/v0.2.1...v0.2.2) (2026-01-31)
+
+
+### Bug Fixes
+
+* fix CI publish lib workflow ([0f00d23](https://github.com/samdouble/repofmt-action/commit/0f00d23d913ed625649d6d9db9d3f89439991811))
+
 ## [0.2.1](https://github.com/samdouble/repofmt-action/compare/v0.2.0...v0.2.1) (2026-01-31)
 
 
