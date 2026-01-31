@@ -126,6 +126,18 @@ declare const configSchema: z.ZodObject<{
             patterns: z.ZodOptional<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>;
     }, z.core.$strip>, z.ZodObject<{
+        name: z.ZodLiteral<"readme/has-section">;
+        level: z.ZodEnum<{
+            error: "error";
+            warning: "warning";
+        }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
+        options: z.ZodObject<{
+            section: z.ZodString;
+            path: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+            caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+        }, z.core.$strip>;
+    }, z.core.$strip>, z.ZodObject<{
         name: z.ZodLiteral<"python/requirements-txt-dependencies-alphabetical-order">;
         level: z.ZodEnum<{
             error: "error";
@@ -292,6 +304,13 @@ declare const yamlHasKeys: (context: RuleContext, ruleOptions: YamlHasKeysOption
     errors: string[];
 }>;
 
+declare const ReadmeHasSectionOptionsSchema: z.ZodObject<{
+    section: z.ZodString;
+    path: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+    caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+}, z.core.$strip>;
+type ReadmeHasSectionOptions = z.input<typeof ReadmeHasSectionOptionsSchema>;
+
 declare const ReadmeHasBadgesOptionsSchema: z.ZodObject<{
     path: z.ZodDefault<z.ZodString>;
     minCount: z.ZodOptional<z.ZodNumber>;
@@ -331,6 +350,9 @@ declare const rulesMapper: {
         errors: string[];
     }>;
     'readme/has-badges': (context: RuleContext, ruleOptions?: ReadmeHasBadgesOptions) => Promise<{
+        errors: string[];
+    }>;
+    'readme/has-section': (context: RuleContext, ruleOptions: ReadmeHasSectionOptions) => Promise<{
         errors: string[];
     }>;
     'yaml-has-keys': (context: RuleContext, ruleOptions: YamlHasKeysOptions) => Promise<{
