@@ -1,10 +1,9 @@
 import { minimatch } from 'minimatch';
 import nodePath from 'node:path';
 import { z } from 'zod';
-import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
 import { isGlobPattern } from '../utils/files';
-import { AlertLevelSchema } from '../utils/types';
+import { createRuleSchema } from '../utils/rule-schema';
 
 export const EntryTypeSchema = z.enum(['file', 'directory', 'any']).default('file');
 
@@ -14,12 +13,7 @@ export const FileForbiddenOptionsSchema = z.object({
   type: EntryTypeSchema,
 });
 
-export const FileForbiddenSchema = z.object({
-  name: z.literal('file-forbidden'),
-  level: AlertLevelSchema,
-  exceptions: z.array(regexPatternSchema).optional(),
-  options: FileForbiddenOptionsSchema,
-});
+export const FileForbiddenSchema = createRuleSchema('file-forbidden', FileForbiddenOptionsSchema);
 
 export type FileForbiddenOptions = z.input<typeof FileForbiddenOptionsSchema>;
 

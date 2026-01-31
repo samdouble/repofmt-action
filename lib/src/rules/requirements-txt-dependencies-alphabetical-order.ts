@@ -1,19 +1,16 @@
 import { z } from 'zod';
-import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
 import { getDependencyName, parseRequirementsFile } from '../utils/python/requirements';
-import { AlertLevelSchema } from '../utils/types';
+import { createRuleSchema } from '../utils/rule-schema';
 
 export const RequirementsTxtDependenciesAlphabeticalOrderOptionsSchema = z.object({
   path: z.string().default('requirements.txt'),
 });
 
-export const RequirementsTxtDependenciesAlphabeticalOrderSchema = z.object({
-  name: z.literal('python/requirements-txt-dependencies-alphabetical-order'),
-  level: AlertLevelSchema,
-  exceptions: z.array(regexPatternSchema).optional(),
-  options: RequirementsTxtDependenciesAlphabeticalOrderOptionsSchema.optional(),
-});
+export const RequirementsTxtDependenciesAlphabeticalOrderSchema = createRuleSchema(
+  'python/requirements-txt-dependencies-alphabetical-order',
+  RequirementsTxtDependenciesAlphabeticalOrderOptionsSchema.optional(),
+);
 
 export type RequirementsTxtDependenciesAlphabeticalOrderOptions = z.input<
   typeof RequirementsTxtDependenciesAlphabeticalOrderOptionsSchema

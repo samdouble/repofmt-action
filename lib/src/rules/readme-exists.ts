@@ -1,7 +1,6 @@
 import { z } from 'zod';
-import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
-import { AlertLevelSchema } from '../utils/types';
+import { createRuleSchema } from '../utils/rule-schema';
 import { fileExists } from './file-exists';
 
 export const ReadmeExistsOptionsSchema = z.object({
@@ -9,12 +8,7 @@ export const ReadmeExistsOptionsSchema = z.object({
   path: z.union([z.string(), z.array(z.string()).min(1)]).optional().default('README.md'),
 });
 
-export const ReadmeExistsSchema = z.object({
-  name: z.literal('readme/exists'),
-  level: AlertLevelSchema,
-  exceptions: z.array(regexPatternSchema).optional(),
-  options: ReadmeExistsOptionsSchema,
-});
+export const ReadmeExistsSchema = createRuleSchema('readme/exists', ReadmeExistsOptionsSchema);
 
 export type ReadmeExistsOptions = z.input<typeof ReadmeExistsOptionsSchema>;
 

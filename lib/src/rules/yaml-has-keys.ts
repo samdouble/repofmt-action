@@ -1,21 +1,15 @@
 import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
-import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
 import { checkHasKeys } from '../utils/has-keys';
-import { AlertLevelSchema } from '../utils/types';
+import { createRuleSchema } from '../utils/rule-schema';
 
 export const YamlHasKeysOptionsSchema = z.object({
   path: z.union([z.string(), z.array(z.string()).min(1)]),
   keys: z.array(z.string()).min(1),
 });
 
-export const YamlHasKeysSchema = z.object({
-  name: z.literal('yaml-has-keys'),
-  level: AlertLevelSchema,
-  exceptions: z.array(regexPatternSchema).optional(),
-  options: YamlHasKeysOptionsSchema,
-});
+export const YamlHasKeysSchema = createRuleSchema('yaml-has-keys', YamlHasKeysOptionsSchema);
 
 export type YamlHasKeysOptions = z.input<typeof YamlHasKeysOptionsSchema>;
 

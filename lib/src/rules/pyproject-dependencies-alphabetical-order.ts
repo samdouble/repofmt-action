@@ -1,8 +1,7 @@
 import { parse as parseToml } from 'smol-toml';
 import { z } from 'zod';
-import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
-import { AlertLevelSchema } from '../utils/types';
+import { createRuleSchema } from '../utils/rule-schema';
 
 export const PyprojectDependenciesAlphabeticalOrderOptionsSchema = z.object({
   path: z.string().default('pyproject.toml'),
@@ -11,12 +10,10 @@ export const PyprojectDependenciesAlphabeticalOrderOptionsSchema = z.object({
     .default(['project.dependencies', 'project.optional-dependencies', 'tool.poetry.dependencies']),
 });
 
-export const PyprojectDependenciesAlphabeticalOrderSchema = z.object({
-  name: z.literal('python/pyproject-dependencies-alphabetical-order'),
-  level: AlertLevelSchema,
-  exceptions: z.array(regexPatternSchema).optional(),
-  options: PyprojectDependenciesAlphabeticalOrderOptionsSchema.optional(),
-});
+export const PyprojectDependenciesAlphabeticalOrderSchema = createRuleSchema(
+  'python/pyproject-dependencies-alphabetical-order',
+  PyprojectDependenciesAlphabeticalOrderOptionsSchema.optional(),
+);
 
 export type PyprojectDependenciesAlphabeticalOrderOptions = z.input<
   typeof PyprojectDependenciesAlphabeticalOrderOptionsSchema
