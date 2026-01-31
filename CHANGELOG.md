@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/samdouble/repofmt-action/compare/v0.1.0...v0.2.0) (2026-01-31)
+
+
+### Features
+
+* **readme/has-badges:** added rule ([0c48cc1](https://github.com/samdouble/repofmt-action/commit/0c48cc104c9d28a828781356eb518c02c2300fbf))
+
 ## [0.1.0](https://github.com/samdouble/repofmt-action/compare/repofmt-action-v0.3.0...repofmt-action-v0.1.0) (2026-01-29)
 
 
