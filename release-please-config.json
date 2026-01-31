@@ -1,12 +1,11 @@
 {
+  "bootstrap-sha": "e795ad384a5730b203150957b9f3730245222230",
   "packages": {
-    ".": {
-      "release-type": "simple",
-      "package-name": "action"
-    },
     "lib": {
-      "release-type": "node",
-      "package-name": "lib"
+      "release-type": "node"
+    },
+    ".": {
+      "release-type": "simple"
     }
   }
 }

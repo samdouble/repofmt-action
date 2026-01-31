@@ -9,6 +9,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodObject<{
             path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
             contains: z.ZodString;
@@ -20,6 +21,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodObject<{
             path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
             contains: z.ZodString;
@@ -31,6 +33,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodObject<{
             caseSensitive: z.ZodDefault<z.ZodBoolean>;
             path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
@@ -46,6 +49,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodObject<{
             caseSensitive: z.ZodDefault<z.ZodBoolean>;
             path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
@@ -61,6 +65,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodOptional<z.ZodObject<{
             maximum: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strip>>;
@@ -70,6 +75,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodObject<{
             path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
             keys: z.ZodArray<z.ZodString>;
@@ -80,6 +86,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodObject<{
             caseSensitive: z.ZodDefault<z.ZodBoolean>;
             path: z.ZodDefault<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
@@ -90,6 +97,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodOptional<z.ZodObject<{
             path: z.ZodDefault<z.ZodString>;
             sections: z.ZodDefault<z.ZodArray<z.ZodString>>;
@@ -100,6 +108,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodObject<{
             caseSensitive: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             path: z.ZodDefault<z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>>;
@@ -110,6 +119,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodOptional<z.ZodObject<{
             path: z.ZodDefault<z.ZodString>;
         }, z.core.$strip>>;
@@ -119,6 +129,7 @@ declare const configSchema: z.ZodObject<{
             error: "error";
             warning: "warning";
         }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
         options: z.ZodObject<{
             path: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
             keys: z.ZodArray<z.ZodString>;
@@ -305,6 +316,16 @@ declare const rulesMapper: {
     }>;
 };
 
+declare function createRuleSchema<TName extends string, TOptions extends z.ZodTypeAny>(name: TName, optionsSchema: TOptions): z.ZodObject<{
+    name: z.ZodLiteral<TName>;
+    level: z.ZodEnum<{
+        error: "error";
+        warning: "warning";
+    }>;
+    exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
+    options: TOptions;
+}, z.core.$strip>;
+
 type Octokit = ReturnType<typeof getOctokit>;
 type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];
 interface RunResult {
@@ -318,4 +339,4 @@ interface RunResult {
 declare function runRulesForRepo(octokit: Octokit, repo: Repository, config: Config): Promise<RunResult>;
 declare function run(octokit: Octokit, config: Config): Promise<RunResult[]>;
 
-export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, fileContains, fileExists, fileForbidden, fileNotContains, getConfig, githubActionsTimeoutMinutes, jsonHasKeys, licenseExists, pyprojectDependenciesAlphabeticalOrder, readmeExists, requirementsTxtDependenciesAlphabeticalOrder, rulesMapper, run, runRulesForRepo, yamlHasKeys };
+export { type Config, type Octokit, type Repository, RuleContext, type RunResult, configSchema, createRuleSchema, fileContains, fileExists, fileForbidden, fileNotContains, getConfig, githubActionsTimeoutMinutes, jsonHasKeys, licenseExists, pyprojectDependenciesAlphabeticalOrder, readmeExists, requirementsTxtDependenciesAlphabeticalOrder, rulesMapper, run, runRulesForRepo, yamlHasKeys };
