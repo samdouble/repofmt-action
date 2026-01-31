@@ -808,3 +808,46 @@ Check that README has at least 2 badges and includes a CI badge:
 
 Patterns are matched case-insensitively against badge alt text, image URLs, and link URLs. For example, the pattern `"CI"` will match badges with alt text like `"CI"`, `"ci"`, or URLs containing `"CI"` or `"ci"`.
 </details>
+
+#### `readme/has-section`
+
+<details>
+<summary>readme/has-section</summary>
+
+The `readme/has-section` rule checks if a README file contains a specific markdown section header (e.g., `## Usage`, `## Installation`).
+
+```json
+{
+  "name": "readme/has-section",
+  "level": "error",
+  "options": {
+    "section": "Usage",
+    "path": "README.md",
+    "caseSensitive": false
+  }
+}
+```
+
+| Option          | Description                                                                  | Required | Default     |
+|-----------------|------------------------------------------------------------------------------|----------|-------------|
+| `section`       | The name of the section to check for (without the `##` prefix).              | Yes      |             |
+| `path`          | The path to the README file.                                                 | No       | `README.md` |
+| `caseSensitive` | Whether to check the section header in a case-sensitive manner.              | No       | `false`     |
+
+**Example:**
+
+Check that README has a "Usage" section:
+
+```json
+{
+  "name": "readme/has-section",
+  "level": "error",
+  "options": {
+    "section": "Usage",
+    "caseSensitive": true
+  }
+}
+```
+
+**Note:** This rule uses substring matching, so a section named "Usage Examples" will match a search for "Usage". For exact matching, specify the full section name.
+</details>

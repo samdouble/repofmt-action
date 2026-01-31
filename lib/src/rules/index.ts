@@ -9,6 +9,7 @@ import { LicenseExistsSchema } from './license-exists';
 import { PyprojectDependenciesAlphabeticalOrderSchema } from './pyproject-dependencies-alphabetical-order';
 import { ReadmeExistsSchema } from './readme-exists';
 import { ReadmeHasBadgesSchema } from './readme-has-badges';
+import { ReadmeHasSectionSchema } from './readme-has-section';
 import { RequirementsTxtDependenciesAlphabeticalOrderSchema } from './requirements-txt-dependencies-alphabetical-order';
 import { YamlHasKeysSchema } from './yaml-has-keys';
 
@@ -23,6 +24,7 @@ export const ruleConfigSchema = z.union([
   PyprojectDependenciesAlphabeticalOrderSchema,
   ReadmeExistsSchema,
   ReadmeHasBadgesSchema,
+  ReadmeHasSectionSchema,
   RequirementsTxtDependenciesAlphabeticalOrderSchema,
   YamlHasKeysSchema,
 ]);

@@ -8,6 +8,7 @@ import { licenseExists } from "./rules/license-exists";
 import { pyprojectDependenciesAlphabeticalOrder } from "./rules/pyproject-dependencies-alphabetical-order";
 import { readmeExists } from "./rules/readme-exists";
 import { readmeHasBadges } from "./rules/readme-has-badges";
+import { readmeHasSection } from "./rules/readme-has-section";
 import { requirementsTxtDependenciesAlphabeticalOrder } from "./rules/requirements-txt-dependencies-alphabetical-order";
 import { yamlHasKeys } from "./rules/yaml-has-keys";
 
@@ -23,5 +24,6 @@ export const rulesMapper = {
   'python/requirements-txt-dependencies-alphabetical-order': requirementsTxtDependenciesAlphabeticalOrder,
   'readme/exists': readmeExists,
   'readme/has-badges': readmeHasBadges,
+  'readme/has-section': readmeHasSection,
   'yaml-has-keys': yamlHasKeys,
 };

@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.4](https://github.com/samdouble/repofmt-action/compare/v0.1.0...v0.2.4) (2026-01-31)
+## [0.2.0](https://github.com/samdouble/repofmt-action/compare/v0.1.0...v0.2.0) (2026-01-31)
 
 
 ### Bug Fixes
