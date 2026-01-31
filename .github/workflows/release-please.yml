@@ -57,7 +57,6 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           target-branch: master
-          component: action
           include-component-in-tag: true
 
   release-please-lib:
@@ -69,8 +68,9 @@ jobs:
         uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.PAT }}
+          release-type: node
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           target-branch: master
-          component: lib
+          path: lib
           include-component-in-tag: true
