@@ -1,39 +1,11 @@
 # Changelog
 
-## [0.2.4](https://github.com/samdouble/repofmt-action/compare/v0.2.3...v0.2.4) (2026-01-31)
+## [0.2.4](https://github.com/samdouble/repofmt-action/compare/v0.1.0...v0.2.4) (2026-01-31)
 
 
 ### Bug Fixes
 
 * fix CI publish lib workflow ([2abd3b5](https://github.com/samdouble/repofmt-action/commit/2abd3b52c88dd0b6d77f94f5a460bf95ed860a18))
-
-## [0.2.3](https://github.com/samdouble/repofmt-action/compare/v0.2.2...v0.2.3) (2026-01-31)
-
-
-### Bug Fixes
-
-* fix CI publish lib workflow ([e0df009](https://github.com/samdouble/repofmt-action/commit/e0df0093521f7fdca876f1ee57fd1301d427e5bc))
-
-## [0.2.2](https://github.com/samdouble/repofmt-action/compare/v0.2.1...v0.2.2) (2026-01-31)
-
-
-### Bug Fixes
-
-* fix CI publish lib workflow ([0f00d23](https://github.com/samdouble/repofmt-action/commit/0f00d23d913ed625649d6d9db9d3f89439991811))
-
-## [0.2.1](https://github.com/samdouble/repofmt-action/compare/v0.2.0...v0.2.1) (2026-01-31)
-
-
-### Bug Fixes
-
-* fix CI publish lib workflow ([e3721a4](https://github.com/samdouble/repofmt-action/commit/e3721a404ddb4ddbaa106be98aaa2a3c790236b8))
-
-## [0.2.0](https://github.com/samdouble/repofmt-action/compare/v0.1.0...v0.2.0) (2026-01-31)
-
-
-### Features
-
-* **readme/has-badges:** added rule ([0c48cc1](https://github.com/samdouble/repofmt-action/commit/0c48cc104c9d28a828781356eb518c02c2300fbf))
 
 ## [0.1.0](https://github.com/samdouble/repofmt-action/compare/repofmt-action-v0.3.0...repofmt-action-v0.1.0) (2026-01-29)
 
