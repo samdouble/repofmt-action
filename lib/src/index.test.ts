@@ -657,4 +657,211 @@ describe('run', () => {
       expect(results[0].repository).toBe('org1/my-org-repo1');
     });
   });
+
+  describe('rule exceptions', () => {
+    it('should skip rule when repository matches exception by name', async () => {
+      mockGetContent.mockResolvedValue({
+        data: {
+          type: 'file',
+          content: Buffer.from('test content').toString('base64'),
+        },
+      });
+
+      const config: Config = {
+        rules: [
+          {
+            name: 'file-exists',
+            level: 'error',
+            options: {
+              path: 'README.md',
+              caseSensitive: false,
+              type: 'file',
+            },
+            exceptions: ['^test-repo$'],
+          },
+        ],
+      };
+
+      const result = await runRulesForRepo(mockOctokit, mockRepository, config);
+
+      expect(result.results).toHaveLength(0);
+      expect(mockGetContent).not.toHaveBeenCalled();
+    });
+
+    it('should skip rule when repository matches exception by full_name', async () => {
+      mockGetContent.mockResolvedValue({
+        data: {
+          type: 'file',
+          content: Buffer.from('test content').toString('base64'),
+        },
+      });
+
+      const config: Config = {
+        rules: [
+          {
+            name: 'file-exists',
+            level: 'error',
+            options: {
+              path: 'README.md',
+              caseSensitive: false,
+              type: 'file',
+            },
+            exceptions: ['^test-owner/'],
+          },
+        ],
+      };
+
+      const result = await runRulesForRepo(mockOctokit, mockRepository, config);
+
+      expect(result.results).toHaveLength(0);
+      expect(mockGetContent).not.toHaveBeenCalled();
+    });
+
+    it('should run rule when repository does not match exception', async () => {
+      mockGetContent.mockRejectedValue(new Error('Not found'));
+
+      const config: Config = {
+        rules: [
+          {
+            name: 'file-exists',
+            level: 'error',
+            options: {
+              path: 'README.md',
+              caseSensitive: false,
+              type: 'file',
+            },
+            exceptions: ['^other-repo$'],
+          },
+        ],
+      };
+
+      const result = await runRulesForRepo(mockOctokit, mockRepository, config);
+
+      expect(result.results).toHaveLength(1);
+      expect(result.results[0].rule).toBe('file-exists');
+      expect(mockGetContent).toHaveBeenCalled();
+    });
+
+    it('should run rule when no exceptions are specified', async () => {
+      mockGetContent.mockRejectedValue(new Error('Not found'));
+
+      const config: Config = {
+        rules: [
+          {
+            name: 'file-exists',
+            level: 'error',
+            options: {
+              path: 'README.md',
+              caseSensitive: false,
+              type: 'file',
+            },
+          },
+        ],
+      };
+
+      const result = await runRulesForRepo(mockOctokit, mockRepository, config);
+
+      expect(result.results).toHaveLength(1);
+      expect(result.results[0].rule).toBe('file-exists');
+      expect(mockGetContent).toHaveBeenCalled();
+    });
+
+    it('should handle multiple exceptions (OR logic)', async () => {
+      mockGetContent.mockResolvedValue({
+        data: {
+          type: 'file',
+          content: Buffer.from('test content').toString('base64'),
+        },
+      });
+
+      const config: Config = {
+        rules: [
+          {
+            name: 'file-exists',
+            level: 'error',
+            options: {
+              path: 'README.md',
+              caseSensitive: false,
+              type: 'file',
+            },
+            exceptions: ['^test-repo$', '^other-repo$'],
+          },
+        ],
+      };
+
+      const result = await runRulesForRepo(mockOctokit, mockRepository, config);
+
+      expect(result.results).toHaveLength(0);
+      expect(mockGetContent).not.toHaveBeenCalled();
+    });
+
+    it('should handle exceptions with regex patterns', async () => {
+      const repo1 = {
+        ...mockRepository,
+        name: 'legacy-repo',
+        full_name: 'test-owner/legacy-repo',
+      };
+      const repo2 = {
+        ...mockRepository,
+        name: 'new-repo',
+        full_name: 'test-owner/new-repo',
+      };
+
+      mockGetContent.mockRejectedValue(new Error('Not found'));
+
+      const config: Config = {
+        rules: [
+          {
+            name: 'file-exists',
+            level: 'error',
+            options: {
+              path: 'README.md',
+              caseSensitive: false,
+              type: 'file',
+            },
+            exceptions: ['^legacy-'],
+          },
+        ],
+      };
+
+      const result1 = await runRulesForRepo(mockOctokit, repo1, config);
+      const result2 = await runRulesForRepo(mockOctokit, repo2, config);
+
+      expect(result1.results).toHaveLength(0);
+      expect(result2.results).toHaveLength(1);
+    });
+
+    it('should apply exceptions per rule, not globally', async () => {
+      mockGetContent.mockRejectedValue(new Error('Not found'));
+
+      const config: Config = {
+        rules: [
+          {
+            name: 'file-exists',
+            level: 'error',
+            options: {
+              path: 'README.md',
+              caseSensitive: false,
+              type: 'file',
+            },
+            exceptions: ['^test-repo$'],
+          },
+          {
+            name: 'license/exists',
+            level: 'error',
+            options: {
+              path: 'LICENSE',
+              caseSensitive: false,
+            },
+          },
+        ],
+      };
+
+      const result = await runRulesForRepo(mockOctokit, mockRepository, config);
+
+      // file-exists should be skipped, but license/exists should run
+      expect(result.results).toHaveLength(1);
+      expect(result.results[0].rule).toBe('license/exists');
+    });
+  });
 });

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
 import { getDependencyName, parseRequirementsFile } from '../utils/python/requirements';
 import { AlertLevelSchema } from '../utils/types';
@@ -10,6 +11,7 @@ export const RequirementsTxtDependenciesAlphabeticalOrderOptionsSchema = z.objec
 export const RequirementsTxtDependenciesAlphabeticalOrderSchema = z.object({
   name: z.literal('python/requirements-txt-dependencies-alphabetical-order'),
   level: AlertLevelSchema,
+  exceptions: z.array(regexPatternSchema).optional(),
   options: RequirementsTxtDependenciesAlphabeticalOrderOptionsSchema.optional(),
 });
 

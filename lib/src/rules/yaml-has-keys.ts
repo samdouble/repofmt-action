@@ -1,5 +1,6 @@
 import { parse as parseYaml } from 'yaml';
 import { z } from 'zod';
+import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
 import { checkHasKeys } from '../utils/has-keys';
 import { AlertLevelSchema } from '../utils/types';
@@ -12,6 +13,7 @@ export const YamlHasKeysOptionsSchema = z.object({
 export const YamlHasKeysSchema = z.object({
   name: z.literal('yaml-has-keys'),
   level: AlertLevelSchema,
+  exceptions: z.array(regexPatternSchema).optional(),
   options: YamlHasKeysOptionsSchema,
 });
 

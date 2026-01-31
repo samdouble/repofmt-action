@@ -1,7 +1,8 @@
 import { z } from 'zod';
-import { fileExists } from './file-exists';
-import { AlertLevelSchema } from '../utils/types';
+import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
+import { AlertLevelSchema } from '../utils/types';
+import { fileExists } from './file-exists';
 
 export const LicenseExistsOptionsSchema = z.object({
   caseSensitive: z.boolean().default(false),
@@ -11,6 +12,7 @@ export const LicenseExistsOptionsSchema = z.object({
 export const LicenseExistsSchema = z.object({
   name: z.literal('license/exists'),
   level: AlertLevelSchema,
+  exceptions: z.array(regexPatternSchema).optional(),
   options: LicenseExistsOptionsSchema,
 });
 
