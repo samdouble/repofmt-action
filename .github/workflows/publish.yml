@@ -15,7 +15,8 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@v4
         with:
-          release-type: simple
+          release-type: node
+          path: lib
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Node
