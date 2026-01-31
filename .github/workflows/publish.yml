@@ -1,9 +1,13 @@
-name: Publish Action
+name: Publish
 
 on:
   push:
     tags:
       - 'v*'
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   publish-lib:
