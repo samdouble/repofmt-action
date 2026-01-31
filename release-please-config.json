@@ -2,11 +2,9 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "action"
-    },
-    "lib": {
-      "release-type": "node",
-      "package-name": "lib"
+      "extra-files": [
+        "lib/package.json"
+      ]
     }
   }
 }

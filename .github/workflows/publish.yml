@@ -1,9 +1,9 @@
-name: Publish Lib
+name: Publish Action
 
 on:
   push:
     tags:
-      - 'repofmt-lib-v*'
+      - 'repofmt-v*'
 
 jobs:
   publish-lib:
@@ -26,3 +26,17 @@ jobs:
       - name: Publish
         run: |
           npm publish --access=public
+
+  publish-action:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: googleapis/release-please-action@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Publish
+        run: |
+          echo "TODO: Publish action"
