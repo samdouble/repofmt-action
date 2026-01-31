@@ -2,7 +2,10 @@
   "bootstrap-sha": "07224c74ce24ef5f75257c786b6918ec2104d314",
   "packages": {
     "lib": {
-      "release-type": "node"
+      "release-type": "node",
+      "extra-files": [
+        "lib/package.json"
+      ]
     },
     ".": {
       "release-type": "simple"
