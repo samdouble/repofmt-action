@@ -114,6 +114,18 @@ declare const configSchema: z.ZodObject<{
             path: z.ZodDefault<z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>>;
         }, z.core.$strip>;
     }, z.core.$strip>, z.ZodObject<{
+        name: z.ZodLiteral<"readme/has-badges">;
+        level: z.ZodEnum<{
+            error: "error";
+            warning: "warning";
+        }>;
+        exceptions: z.ZodOptional<z.ZodArray<z.ZodString>>;
+        options: z.ZodObject<{
+            path: z.ZodDefault<z.ZodString>;
+            minCount: z.ZodOptional<z.ZodNumber>;
+            patterns: z.ZodOptional<z.ZodArray<z.ZodString>>;
+        }, z.core.$strip>;
+    }, z.core.$strip>, z.ZodObject<{
         name: z.ZodLiteral<"python/requirements-txt-dependencies-alphabetical-order">;
         level: z.ZodEnum<{
             error: "error";
@@ -280,6 +292,13 @@ declare const yamlHasKeys: (context: RuleContext, ruleOptions: YamlHasKeysOption
     errors: string[];
 }>;
 
+declare const ReadmeHasBadgesOptionsSchema: z.ZodObject<{
+    path: z.ZodDefault<z.ZodString>;
+    minCount: z.ZodOptional<z.ZodNumber>;
+    patterns: z.ZodOptional<z.ZodArray<z.ZodString>>;
+}, z.core.$strip>;
+type ReadmeHasBadgesOptions = z.input<typeof ReadmeHasBadgesOptionsSchema>;
+
 declare const rulesMapper: {
     'file-contains': (context: RuleContext, ruleOptions: FileContainsOptions) => Promise<{
         errors: string[];
@@ -309,6 +328,9 @@ declare const rulesMapper: {
         errors: string[];
     }>;
     'readme/exists': (context: RuleContext, ruleOptions: ReadmeExistsOptions) => Promise<{
+        errors: string[];
+    }>;
+    'readme/has-badges': (context: RuleContext, ruleOptions?: ReadmeHasBadgesOptions) => Promise<{
         errors: string[];
     }>;
     'yaml-has-keys': (context: RuleContext, ruleOptions: YamlHasKeysOptions) => Promise<{
