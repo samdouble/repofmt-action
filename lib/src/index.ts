@@ -18,6 +18,7 @@ export { yamlHasKeys } from './rules/yaml-has-keys';
 export { rulesMapper } from './rulesMapper';
 export { configSchema, getConfig, type Config } from './utils/config';
 export { RuleContext } from './utils/context';
+export { createRuleSchema } from './utils/rule-schema';
 
 export type Octokit = ReturnType<typeof getOctokit>;
 export type Repository = RestEndpointMethodTypes['repos']['listForAuthenticatedUser']['response']['data'][number];

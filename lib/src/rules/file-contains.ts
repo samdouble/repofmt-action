@@ -1,8 +1,7 @@
 import { z } from 'zod';
-import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
 import { findMatchingFiles, isGlobPattern } from '../utils/files';
-import { AlertLevelSchema } from '../utils/types';
+import { createRuleSchema } from '../utils/rule-schema';
 
 export const FileContainsOptionsSchema = z.object({
   path: z.union([z.string(), z.array(z.string()).min(1)]),
@@ -10,12 +9,7 @@ export const FileContainsOptionsSchema = z.object({
   caseSensitive: z.boolean().default(false),
 });
 
-export const FileContainsSchema = z.object({
-  name: z.literal('file-contains'),
-  level: AlertLevelSchema,
-  exceptions: z.array(regexPatternSchema).optional(),
-  options: FileContainsOptionsSchema,
-});
+export const FileContainsSchema = createRuleSchema('file-contains', FileContainsOptionsSchema);
 
 export type FileContainsOptions = z.input<typeof FileContainsOptionsSchema>;
 

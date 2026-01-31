@@ -1,20 +1,14 @@
 import { z } from 'zod';
-import { regexPatternSchema } from '../utils/config';
 import type { RuleContext } from '../utils/context';
 import { checkHasKeys } from '../utils/has-keys';
-import { AlertLevelSchema } from '../utils/types';
+import { createRuleSchema } from '../utils/rule-schema';
 
 export const JsonHasKeysOptionsSchema = z.object({
   path: z.union([z.string(), z.array(z.string()).min(1)]),
   keys: z.array(z.string()).min(1),
 });
 
-export const JsonHasKeysSchema = z.object({
-  name: z.literal('json-has-keys'),
-  level: AlertLevelSchema,
-  exceptions: z.array(regexPatternSchema).optional(),
-  options: JsonHasKeysOptionsSchema,
-});
+export const JsonHasKeysSchema = createRuleSchema('json-has-keys', JsonHasKeysOptionsSchema);
 
 export type JsonHasKeysOptions = z.input<typeof JsonHasKeysOptionsSchema>;
 
