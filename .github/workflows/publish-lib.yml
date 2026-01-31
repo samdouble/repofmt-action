@@ -3,7 +3,7 @@ name: Publish Lib
 on:
   push:
     tags:
-      - 'repofmt-v*'
+      - 'repofmt-lib-v*'
 
 jobs:
   publish-lib:
