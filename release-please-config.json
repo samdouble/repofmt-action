@@ -1,10 +1,10 @@
 {
   "packages": {
+    "lib": {
+      "release-type": "node"
+    },
     ".": {
-      "release-type": "node",
-      "extra-files": [
-        "lib/package.json"
-      ]
+      "release-type": "simple"
     }
   }
 }
