@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.0](https://github.com/samdouble/repofmt-action/compare/v0.2.0...v0.3.0) (2026-01-31)
+
+
+### Features
+
+* **readme/has-section:** added rule ([b8636f3](https://github.com/samdouble/repofmt-action/commit/b8636f3bc7dbd8dc7ad282935fc06a53e38e79a8))
+
+
+### Bug Fixes
+
+* fix CI publish lib workflow ([0c868d6](https://github.com/samdouble/repofmt-action/commit/0c868d67f56ffeb18edac4a94dc2d0941355202b))
+* fix CI publish lib workflow ([814076b](https://github.com/samdouble/repofmt-action/commit/814076b2fe3ca9d21522604e36b3c1fe88a038ee))
+* fix CI publish lib workflow ([5345d2c](https://github.com/samdouble/repofmt-action/commit/5345d2c5dd130cc2073d1b8b69107872706af72e))
+* fix CI publish lib workflow ([253d7c9](https://github.com/samdouble/repofmt-action/commit/253d7c9e38baaeb3a5dc253e4800ac1f7bc397d3))
+* fix CI publish lib workflow ([2abd3b5](https://github.com/samdouble/repofmt-action/commit/2abd3b52c88dd0b6d77f94f5a460bf95ed860a18))
+* fix CI publish lib workflow ([e0df009](https://github.com/samdouble/repofmt-action/commit/e0df0093521f7fdca876f1ee57fd1301d427e5bc))
+* fix CI publish lib workflow ([0f00d23](https://github.com/samdouble/repofmt-action/commit/0f00d23d913ed625649d6d9db9d3f89439991811))
+* fix CI publish lib workflow ([e3721a4](https://github.com/samdouble/repofmt-action/commit/e3721a404ddb4ddbaa106be98aaa2a3c790236b8))
+
 ## [0.2.0](https://github.com/samdouble/repofmt-action/compare/v0.1.0...v0.2.0) (2026-01-31)
 
 
