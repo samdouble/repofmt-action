@@ -98,7 +98,7 @@ Each rule has the following structure:
   name: 'rule-name',
   level: 'error' | 'warning',
   options: { /* rule-specific options */ },
-  exceptions?: string[] // Optional: array of regex patterns
+  exceptions?: string[]
 }
 ```
 
@@ -731,4 +731,80 @@ You can provide an array of alternative paths:
   }
 }
 ```
+</details>
+
+#### `readme/has-badges`
+
+<details>
+<summary>readme/has-badges</summary>
+
+The `readme/has-badges` rule checks if a README file contains markdown badges (e.g., `[![...](...)](...)`).
+
+```json
+{
+  "name": "readme/has-badges",
+  "level": "error",
+  "options": {
+    "path": "README.md",
+    "minCount": 3,
+    "patterns": ["CI", "Coverage"]
+  }
+}
+```
+
+| Option    | Description                                                                                      | Required | Default     |
+|-----------|--------------------------------------------------------------------------------------------------|----------|-------------|
+| `path`    | The path to the README file.                                                                    | No       | `README.md` |
+| `minCount` | The minimum number of badges required. If not specified, at least one badge is required.        | No       |             |
+| `patterns` | Array of regex patterns to match against badge alt text, image URLs, or link URLs. A badge must be found for **all** patterns. | No       |             |
+
+**Examples:**
+
+Check that README has at least one badge:
+
+```json
+{
+  "name": "readme/has-badges",
+  "level": "error"
+}
+```
+
+Check that README has at least 3 badges:
+
+```json
+{
+  "name": "readme/has-badges",
+  "level": "error",
+  "options": {
+    "minCount": 3
+  }
+}
+```
+
+Check that README has specific badges (CI and Coverage):
+
+```json
+{
+  "name": "readme/has-badges",
+  "level": "error",
+  "options": {
+    "patterns": ["CI", "Coverage"]
+  }
+}
+```
+
+Check that README has at least 2 badges and includes a CI badge:
+
+```json
+{
+  "name": "readme/has-badges",
+  "level": "error",
+  "options": {
+    "minCount": 2,
+    "patterns": ["CI"]
+  }
+}
+```
+
+Patterns are matched case-insensitively against badge alt text, image URLs, and link URLs. For example, the pattern `"CI"` will match badges with alt text like `"CI"`, `"ci"`, or URLs containing `"CI"` or `"ci"`.
 </details>

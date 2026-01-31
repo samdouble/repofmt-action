@@ -859,7 +859,6 @@ describe('run', () => {
 
       const result = await runRulesForRepo(mockOctokit, mockRepository, config);
 
-      // file-exists should be skipped, but license/exists should run
       expect(result.results).toHaveLength(1);
       expect(result.results[0].rule).toBe('license/exists');
     });
