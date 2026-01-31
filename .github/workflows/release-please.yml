@@ -57,5 +57,4 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           target-branch: master
-          extra-files: |
-            lib/package.json
+          path: lib
